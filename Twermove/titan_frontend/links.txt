@@ -1,0 +1,14 @@
+Project Titan — Page Links
+==========================
+
+MAIN MENU (flash monologue + chaos background)
+file:///C:/Users/PREDATOR/OneDrive/Desktop/Twermove/titan_frontend/index.html
+
+SETTINGS (BPM, tolerance, key config)
+file:///C:/Users/PREDATOR/OneDrive/Desktop/Twermove/titan_frontend/settings.html
+
+PLAY (game canvas)
+file:///C:/Users/PREDATOR/OneDrive/Desktop/Twermove/titan_frontend/play.html
+
+DEV HUB (styled preview with all links + emotion legend)
+file:///C:/Users/PREDATOR/OneDrive/Desktop/Twermove/titan_frontend/preview.html

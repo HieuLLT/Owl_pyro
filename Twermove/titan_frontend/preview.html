@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Titan &#8212; Dev Preview Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:     #030303;
+      --red:    #e82020;
+      --red-g:  rgba(232,32,32,0.45);
+      --red-d:  rgba(232,32,32,0.12);
+      --white:  #f0f0f0;
+      --dim:    rgba(240,240,240,0.45);
+      --font:   'Space Mono', 'Courier New', monospace;
+      --rage:   #ff5500;
+      --envy:   #00cc44;
+      --despair:#5599ff;
+      --shame:  #cc44ff;
+      --hatred: #cc0000;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 60px clamp(24px, 6vw, 80px) 80px;
+      overflow-y: auto;
+    }
+
+    /* CRT scanline */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 9000; pointer-events: none;
+      background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+    }
+
+    /* Header */
+    .hub-header {
+      margin-bottom: 52px;
+      border-bottom: 1px solid rgba(232,32,32,0.15);
+      padding-bottom: 32px;
+    }
+
+    .hub-eyebrow {
+      font-size: 8px; letter-spacing: 6px;
+      color: var(--red); opacity: 0.6; margin-bottom: 14px;
+    }
+
+    .hub-title {
+      font-size: clamp(24px, 4vw, 48px); font-weight: 700;
+      letter-spacing: 8px; color: var(--white);
+      text-shadow: 0 0 28px var(--red-g), 0 0 80px var(--red-d);
+    }
+
+    .hub-subtitle {
+      font-size: 9px; letter-spacing: 4px; color: var(--red);
+      opacity: 0.55; margin-top: 12px;
+    }
+
+    /* Page grid */
+    .page-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .page-card {
+      border: 1px solid rgba(232,32,32,0.22);
+      background: rgba(232,32,32,0.02);
+      padding: 28px 28px 24px;
+      position: relative;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.08s, background 0.08s, box-shadow 0.08s;
+      cursor: pointer;
+    }
+
+    .page-card::before {
+      content: ''; position: absolute; inset: 5px;
+      border: 1px solid rgba(232,32,32,0.08); pointer-events: none;
+    }
+
+    .page-card:hover {
+      border-color: var(--red);
+      background: rgba(232,32,32,0.05);
+      box-shadow: 0 0 28px var(--red-d), inset 0 0 20px rgba(232,32,32,0.03);
+    }
+
+    .card-tag {
+      font-size: 7px; letter-spacing: 4px;
+      color: var(--red); opacity: 0.5; margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .card-name {
+      font-size: 16px; font-weight: 700;
+      letter-spacing: 4px; color: var(--white);
+      margin-bottom: 8px; text-transform: uppercase;
+    }
+
+    .card-desc {
+      font-size: 9px; letter-spacing: 1.5px;
+      color: var(--dim); line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
+    .card-url {
+      font-size: 8px; letter-spacing: 2px;
+      color: rgba(232,32,32,0.55);
+      border-top: 1px solid rgba(232,32,32,0.12);
+      padding-top: 12px; word-break: break-all;
+    }
+
+    .card-arrow {
+      position: absolute; top: 28px; right: 28px;
+      font-size: 16px; color: rgba(232,32,32,0.3);
+      transition: color 0.08s, transform 0.08s;
+    }
+    .page-card:hover .card-arrow {
+      color: var(--red); transform: translate(3px,-3px);
+    }
+
+    /* Emotion legend grid */
+    .legend-section { margin-top: 52px; }
+
+    .section-title {
+      font-size: 8px; letter-spacing: 5px; color: var(--red); opacity: 0.5;
+      margin-bottom: 20px; text-transform: uppercase;
+    }
+
+    /* 5-column grid, collapses to 2 on narrow screens */
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 900px) { .legend-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .legend-grid { grid-template-columns: 1fr; } }
+
+    .legend-card {
+      border: 1px solid currentColor;
+      padding: 18px 16px 14px;
+      display: flex; flex-direction: column; gap: 8px;
+      opacity: 0.85;
+      transition: opacity 0.08s;
+    }
+    .legend-card:hover { opacity: 1; }
+
+    .legend-emotion {
+      font-size: 9px; letter-spacing: 4px;
+      font-weight: 700; text-transform: uppercase;
+    }
+    .legend-font {
+      font-size: 7px; letter-spacing: 2px;
+      opacity: 0.55; text-transform: none; font-family: 'Space Mono', monospace;
+    }
+    .legend-sample {
+      font-size: 18px; line-height: 1.2; margin-top: 4px;
+    }
+    .legend-hex {
+      font-size: 7px; letter-spacing: 2px; opacity: 0.45;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .lc-rage    { color: var(--rage);    border-color: rgba(255,85,0,0.5);    }
+    .lc-envy    { color: var(--envy);    border-color: rgba(0,204,68,0.5);    }
+    .lc-despair { color: var(--despair); border-color: rgba(68,136,255,0.5);  }
+    .lc-shame   { color: var(--shame);   border-color: rgba(204,68,255,0.5);  }
+    .lc-hatred  { color: var(--hatred);  border-color: rgba(204,0,0,0.5);     }
+    .lc-frag    { color: var(--red);     border-color: rgba(232,32,32,0.6);   text-shadow: 0 0 10px var(--red-g); }
+
+    /* Footer */
+    .hub-footer {
+      margin-top: 60px; padding-top: 24px;
+      border-top: 1px solid rgba(232,32,32,0.08);
+      font-size: 8px; letter-spacing: 2.5px;
+      color: rgba(232,32,32,0.22);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+
+    #hubTime { color: rgba(232,32,32,0.35); }
+  </style>
+</head>
+<body>
+
+  <header class="hub-header">
+    <p class="hub-eyebrow">DEV_PREVIEW_HUB // ALL_ROUTES</p>
+    <h1 class="hub-title">PROJECT TITAN</h1>
+    <p class="hub-subtitle">CLICK ANY CARD TO OPEN THE PAGE IN THIS TAB</p>
+  </header>
+
+  <div class="page-grid">
+
+    <a href="http://localhost:3000/index.html" class="page-card">
+      <span class="card-arrow">&#8599;</span>
+      <p class="card-tag">01 // ENTRY POINT</p>
+      <p class="card-name">Main Terminal</p>
+      <p class="card-desc">
+        Depth-engine chaos background (220 nodes).<br/>
+        Emotion-typed flash monologue sequence.<br/>
+        Broken-metal clip-path menu buttons.
+      </p>
+      <p class="card-url">localhost:3000/index.html</p>
+    </a>
+
+    <a href="http://localhost:3000/settings.html" class="page-card">
+      <span class="card-arrow">&#8599;</span>
+      <p class="card-tag">02 // CONFIGURATION</p>
+      <p class="card-name">System Config</p>
+      <p class="card-desc">
+        BPM / tolerance / key-mapping settings.<br/>
+        Sends config + beatmap to backend API.<br/>
+        Redirects to play.html on launch.
+      </p>
+      <p class="card-url">localhost:3000/settings.html</p>
+    </a>
+
+    <a href="http://localhost:3000/play.html" class="page-card">
+      <span class="card-arrow">&#8599;</span>
+      <p class="card-tag">03 // GAME ENGINE</p>
+      <p class="card-name">Play Canvas</p>
+      <p class="card-desc">
+        Canvas-based rhythm game loop.<br/>
+        Nodes: NONE / CHASER / BLOCKADE / DIVERTER.<br/>
+        Validates run against backend /validate-run.
+      </p>
+      <p class="card-url">localhost:3000/play.html</p>
+    </a>
+
+  </div>
+
+  <div class="legend-section">
+    <p class="section-title">Emotion × Font × Colour Matrix</p>
+    <div class="legend-grid">
+
+      <div class="legend-card lc-rage">
+        <span class="legend-emotion">Rage</span>
+        <span class="legend-font">KillCrazy BB</span>
+        <span class="legend-sample" style="font-family:'Space Mono',monospace">WHY WON’T IT STOP.</span>
+        <span class="legend-hex">#ff3300</span>
+      </div>
+
+      <div class="legend-card lc-envy">
+        <span class="legend-emotion">Envy</span>
+        <span class="legend-font">Hundred Watt</span>
+        <span class="legend-sample" style="font-family:'Space Mono',monospace">Why not me.</span>
+        <span class="legend-hex">#00e84e</span>
+      </div>
+
+      <div class="legend-card lc-despair">
+        <span class="legend-emotion">Despair</span>
+        <span class="legend-font">Skippy Sharpi</span>
+        <span class="legend-sample" style="font-family:'Space Mono',monospace">Make it stop. Please.</span>
+        <span class="legend-hex">#4488ff</span>
+      </div>
+
+      <div class="legend-card lc-shame">
+        <span class="legend-emotion">Shame</span>
+        <span class="legend-font">MTO Grunge Sans</span>
+        <span class="legend-sample" style="font-family:'Space Mono',monospace">They all saw.</span>
+        <span class="legend-hex">#dd33ff</span>
+      </div>
+
+      <div class="legend-card lc-hatred">
+        <span class="legend-emotion">Hatred</span>
+        <span class="legend-font">MTO Getting Angry</span>
+        <span class="legend-sample" style="font-family:'Space Mono',monospace">I hate them.</span>
+        <span class="legend-hex">#ff1111</span>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="hub-footer">
+    <span>TITAN_OS v2.7.0 // DEV_PREVIEW_HUB</span>
+    <span id="hubTime">&#8212;</span>
+    <span>3 ROUTES INDEXED</span>
+  </footer>
+
+  <script>
+    const t = document.getElementById('hubTime');
+    function tick() {
+      const n = new Date();
+      t.textContent = `SYS_TIME: ${
+        String(n.getHours()).padStart(2,'0')}:${
+        String(n.getMinutes()).padStart(2,'0')}:${
+        String(n.getSeconds()).padStart(2,'0')}`;
+    }
+    tick(); setInterval(tick, 1000);
+  </script>
+
+</body>
+</html>

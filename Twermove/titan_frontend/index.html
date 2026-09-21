@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Titan &#8212; Neural Rhythmic Assault System</title>
+  <meta name="description" content="Project Titan: a glitch-core rhythm puzzle game built on dynamic data structures. React. Survive. Conquer." />
+  <link rel="stylesheet" href="static/style.css" />
+  <script src="static/vent.js"></script>
+  <style>
+    /* ── Atmosphere CSS variables ────────────────────────────────
+       Tune vibe here without touching anything else. */
+    :root {
+      --void-black:   #030303;   /* absolute vacuum */
+      --void-crimson: #120000;   /* bruised, barely-there red */
+      --chroma-red:   rgba(255,0,0,0.8);
+      --chroma-cyan:  rgba(0,255,255,0.8);
+    }
+
+    /* Effect 1 — Breathing Void (8 s, black ↔ bruised crimson) */
+    @keyframes void-breathe {
+      from { background-color: var(--void-black); }
+      to   { background-color: var(--void-crimson); }
+    }
+
+    body {
+      overflow: hidden;
+      animation: void-breathe 8s ease-in-out infinite alternate;
+    }
+
+    /* Claustrophobic vignette — forces eyes to center of chaos */
+    .vignette {
+      position: fixed; inset: 0; z-index: 4; pointer-events: none;
+      background: radial-gradient(
+        ellipse 80% 75% at 50% 50%,
+        transparent 36%,
+        rgba(0,0,0,0.5) 66%,
+        rgba(0,0,0,0.94) 100%
+      );
+    }
+
+    .static-noise {
+      position: fixed; inset: 0; z-index: 5;
+      pointer-events: none; opacity: 0.055;
+      filter: url(#titan-static); background: #fff;
+    }
+
+    .crt-scanlines {
+      position: fixed; inset: 0; z-index: 6; pointer-events: none;
+      background:
+        linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.18) 50%),
+        linear-gradient(90deg, rgba(232,32,32,0.04), rgba(0,255,0,0.01), rgba(0,0,255,0.03));
+      background-size: 100% 3px, 4px 100%;
+    }
+
+    #chaos-container {
+      position: fixed; inset: 0; z-index: 10; pointer-events: none;
+    }
+
+    .vent-phrase {
+      position: absolute; white-space: nowrap;
+      user-select: none; pointer-events: none;
+      font-family: var(--font); mix-blend-mode: screen; color: var(--red);
+    }
+
+    .vent-phrase.white-tint  { color: rgba(240,240,240,1); mix-blend-mode: overlay; }
+    .vent-phrase.envy-tint   { color: #1a6600; mix-blend-mode: screen; font-family: var(--font-envy); }
+    .vent-phrase.rage-tint   { color: #ff4400; mix-blend-mode: screen; font-family: var(--font-rage); }
+    .vent-phrase.despair-tint{ color: #0a1a6e; mix-blend-mode: screen; font-family: var(--font-despair); }
+    .vent-phrase.shame-tint  { color: #3a0050; mix-blend-mode: screen; font-family: var(--font-shame); }
+    .vent-phrase.system-tint { color: #003322; mix-blend-mode: screen; font-family: var(--font-system); font-size: 0.55em; letter-spacing: 1px; }
+
+    #flash-container {
+      position: fixed; inset: 0; z-index: 100; pointer-events: none;
+    }
+
+    .flash-phrase {
+      position: absolute;
+      font-family: var(--font); font-weight: 400;
+      color: var(--white); white-space: nowrap;
+      pointer-events: none; user-select: none; opacity: 0;
+      max-width: 88vw; overflow: hidden;
+      text-shadow: 0 0 12px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.95), 2px 2px 6px rgba(0,0,0,1);
+      transition: opacity 0.35s ease;
+    }
+
+    .flash-phrase.is-fragment {
+      color: var(--red); font-weight: 700;
+      font-family: var(--font-angry);
+      letter-spacing: 4px;
+      text-shadow: 0 0 24px var(--red-glow), 0 0 50px rgba(232,32,32,0.3), 2px 2px 6px rgba(0,0,0,1);
+    }
+    /* RAGE — KillCrazy */
+    .flash-phrase.is-rage {
+      color: #ff3300; font-family: var(--font-rage); letter-spacing: 3px;
+      text-shadow: 0 0 22px rgba(255,51,0,0.85), 0 0 50px rgba(255,51,0,0.4), 2px 2px 6px rgba(0,0,0,1);
+    }
+    /* ENVY — Hundred Watt */
+    .flash-phrase.is-envy {
+      color: #00e84e; font-family: var(--font-envy);
+      text-shadow: 0 0 22px rgba(0,232,78,0.75), 0 0 50px rgba(0,232,78,0.3), 2px 2px 6px rgba(0,0,0,1);
+    }
+    /* DESPAIR — Skippy Sharpi (“scratched in a notebook in a panic”) */
+    .flash-phrase.is-despair {
+      color: #4488ff; font-family: var(--font-despair);
+      text-shadow: 0 0 20px rgba(68,136,255,0.75), 0 0 45px rgba(68,136,255,0.3), 2px 2px 6px rgba(0,0,0,1);
+    }
+    /* SHAME — MTO Grunge Sans */
+    .flash-phrase.is-shame {
+      color: #dd33ff; font-family: var(--font-shame);
+      text-shadow: 0 0 20px rgba(221,51,255,0.75), 0 0 45px rgba(221,51,255,0.3), 2px 2px 6px rgba(0,0,0,1);
+    }
+    /* HATRED — MTO Getting Angry */
+    .flash-phrase.is-hatred {
+      color: #ff1111; font-family: var(--font-angry);
+      text-shadow: 0 0 20px rgba(255,17,17,0.85), 0 0 50px rgba(255,17,17,0.4), 2px 2px 6px rgba(0,0,0,1);
+    }
+
+    .menu-actions {
+      position: fixed; bottom: 52px; left: clamp(5vw, 8vw, 120px);
+      z-index: 200; display: flex; gap: 18px; flex-wrap: wrap;
+      opacity: 0; animation: btn-reveal 0.6s ease 4.8s forwards;
+    }
+
+    @keyframes btn-reveal { to { opacity: 1; } }
+
+    .metal-btn {
+      position: relative;
+      background: linear-gradient(112deg, #2a0000 0%, #1a0000 25%, #3d0000 50%, #0d0000 72%, #1f0000 100%);
+      color: rgba(232,32,32,0.9); font-family: var(--font);
+      font-size: 11px; font-weight: 700; padding: 18px 38px;
+      text-transform: uppercase; letter-spacing: 5px; text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: none; cursor: pointer; user-select: none;
+      clip-path: polygon(2% 0%, 96% 0%, 100% 4%, 98% 38%, 100% 44%, 97% 100%, 4% 100%, 0% 96%, 3% 48%, 0% 42%);
+      /* Effect 2 — Chromatic Aberration: always-on -2px/+2px RGB channel split */
+      text-shadow:
+        1px 1px 4px #000,
+        0 0 12px rgba(232,32,32,0.4),
+        -2px 0 0 var(--chroma-red),
+        2px 0 0 var(--chroma-cyan);
+      box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), inset -4px -4px 14px rgba(0,0,0,0.85);
+      transition: color 0.08s, text-shadow 0.08s, background 0.08s;
+    }
+    .metal-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(72deg, transparent, transparent 5px, rgba(255,255,255,0.03) 5px, rgba(255,255,255,0.03) 6px);
+      pointer-events: none;
+    }
+    .metal-btn::before {
+      content: ''; position: absolute; inset: 0; clip-path: inherit;
+      box-shadow: inset 0 0 0 1px rgba(232,32,32,0.28); pointer-events: none;
+    }
+    .metal-btn:hover {
+      background: linear-gradient(112deg, #3d0000 0%, #2a0000 25%, #550000 50%, #1a0000 72%, #330000 100%);
+      color: #fff; text-shadow: 0 0 8px rgba(232,32,32,0.95), 1px 1px 4px #000;
+      transform: translate(-2px,-2px);
+      box-shadow: inset 2px 2px 5px rgba(255,255,255,0.07), inset -4px -4px 14px rgba(0,0,0,0.85), 0 0 28px var(--red-glow), 0 0 55px var(--red-dim);
+    }
+    .metal-btn:active { transform: translate(2px,2px); box-shadow: none; }
+
+    .metal-btn.secondary {
+      background: linear-gradient(112deg, #111 0%, #0a0a0a 30%, #1a1a1a 50%, #050505 72%, #0f0f0f 100%);
+      color: rgba(240,240,240,0.4);
+      clip-path: polygon(1% 0%, 97% 0%, 100% 3%, 99% 55%, 100% 60%, 98% 100%, 2% 100%, 0% 97%, 2% 40%, 0% 35%);
+    }
+    .metal-btn.secondary:hover {
+      background: linear-gradient(112deg, #222 0%, #181818 30%, #2a2a2a 50%, #111 72%, #1e1e1e 100%);
+      color: rgba(240,240,240,0.9);
+      text-shadow: 0 0 8px rgba(255,255,255,0.5), 1px 1px 4px #000;
+      box-shadow: inset 2px 2px 5px rgba(255,255,255,0.07), 0 0 24px rgba(255,255,255,0.15);
+    }
+
+
+    /* Effect 3 — System Tear ──────────────────────────────────
+       A 150 ms CSS state triggered by JS at a random 3–7 s interval.
+       body.system-tear applies three simultaneous corruptions. */
+
+    /* The horizontal tear slice: a glowing strip that
+       shifts sideways during the tear (position randomised by JS) */
+    .system-tear-slice {
+      position: fixed; top: 35%; height: 7%;
+      left: 0; right: 0; z-index: 9990;
+      pointer-events: none; opacity: 0;
+      background: transparent;
+      transform: translateX(0);
+      clip-path: inset(0 0 0 0);
+      will-change: transform, opacity;
+      transition: none !important;
+    }
+
+    /* 3a. Tear slice appears + shifts left */
+    body.system-tear .system-tear-slice {
+      opacity: 1;
+      transform: translateX(-10px);
+      background: linear-gradient(
+        to bottom,
+        rgba(255,0,0,0.20) 0%,
+        rgba(0,255,255,0.14) 50%,
+        rgba(255,0,0,0.10) 100%
+      );
+      filter: blur(0.4px);
+    }
+
+    /* 3b. Chromatic aberration expands from ±2px → ±8px on buttons */
+    body.system-tear .metal-btn {
+      text-shadow:
+        1px 1px 4px #000,
+        0 0 12px rgba(232,32,32,0.4),
+        -8px 0 0 var(--chroma-red),
+        8px 0 0 var(--chroma-cyan);
+      transition: none;
+    }
+
+    /* 3c. The menu skews with the tear */
+    body.system-tear .menu-actions {
+      transform: translateX(-8px) skewX(-0.4deg);
+      transition: none;
+    }
+
+    /* 3d. Background chaos container: slight displacement + saturation spike */
+    body.system-tear #chaos-container {
+      transform: translateX(-6px) skewX(0.5deg);
+      filter: saturate(1.5) brightness(1.12);
+      transition: none;
+    }
+
+    /* 3e. Full-viewport: adds coarse horizontal scan-lines during tear */
+    body.system-tear::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 9988;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent     0px,
+        transparent     3px,
+        rgba(232,32,32,0.06) 3px,
+        rgba(232,32,32,0.06) 4px
+      );
+      pointer-events: none;
+    }
+
+    .index-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; padding: 14px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font); font-size: 8px; letter-spacing: 2.5px;
+      color: rgba(232,32,32,0.22); border-top: 1px solid rgba(232,32,32,0.06); z-index: 200;
+    }
+
+    /* ── Transition veil: fades screen to black on quick-launch ── */
+    #transition-veil {
+      position: fixed; inset: 0; z-index: 999999;
+      background: #000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.9s ease;
+    }
+    #transition-veil.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Button state during async fetch */
+    .metal-btn.processing {
+      opacity: 0.7;
+      pointer-events: none;
+      cursor: not-allowed;
+      letter-spacing: 8px; /* widened letters = “loading” feel */
+    }
+    .metal-btn.error-state {
+      color: var(--red);
+      text-shadow: 0 0 14px rgba(232,32,32,0.9), -2px 0 0 var(--chroma-red), 2px 0 0 var(--chroma-cyan);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="vent-bg" id="ventBg" aria-hidden="true"></div>
+
+  <!-- Vignette: darkens edges, keeps eyes locked to center -->
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- System Tear slice: JS repositions + body.system-tear animates -->
+  <div class="system-tear-slice" aria-hidden="true"></div>
+
+  <svg style="display:none;" aria-hidden="true">
+    <filter id="titan-static" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+    </filter>
+  </svg>
+
+  <div class="static-noise"  aria-hidden="true"></div>
+  <div class="crt-scanlines" aria-hidden="true"></div>
+  <div id="chaos-container"  aria-hidden="true"></div>
+  <div id="flash-container"  aria-live="polite"></div>
+
+  <!-- Transition veil: JS activates this to fade screen to black before redirect -->
+  <div id="transition-veil" aria-hidden="true"></div>
+
+  <nav class="menu-actions" aria-label="Main menu">
+    <a href="settings.html" class="metal-btn"           id="btnStart">Initialize_Run</a>
+    <a href="settings.html" class="metal-btn secondary" id="btnSettings">System_Config</a>
+  </nav>
+
+  <footer class="index-footer" aria-label="System info">
+    <span>TITAN_OS v2.7.0 // BACKEND_LINK: 127.0.0.1:8000</span>
+    <span id="sysTime">&#8212;</span>
+    <span>SEQUENCE_ENGINE: ONLINE</span>
+  </footer>
+
+  <script>
+    /* ===================================================
+       BACKGROUND PHRASE POOL
+       Every entry now has a tint — no more plain red default.
+       tint: 'rage-tint' | 'envy-tint' | 'despair-tint' |
+             'shame-tint' | 'system-tint'
+    =================================================== */
+    const BG_POOL = [
+      // Despair — UEE Disposable, blue
+      { text: "My life is over.",                 tint: "despair-tint" },
+      { text: "I'll never see them again.",       tint: "despair-tint" },
+      { text: "I'm so tired.",                    tint: "despair-tint" },
+      { text: "What's the point.",                tint: "despair-tint" },
+      { text: "I can't do this anymore.",         tint: "despair-tint" },
+      { text: "Nobody knows.",                    tint: "despair-tint" },
+      { text: "I've already lost.",               tint: "despair-tint" },
+      { text: "It's over.",                       tint: "despair-tint" },
+      { text: "I am hollow.",                     tint: "despair-tint" },
+      { text: "I'm crying.",                      tint: "despair-tint" },
+      { text: "It's been a while.",               tint: "despair-tint" },
+      { text: "I'll never\u2014",                 tint: "despair-tint" },
+      { text: "Nothing changes.",                 tint: "despair-tint" },
+      { text: "Nobody's coming.",                 tint: "despair-tint" },
+      { text: "I used to be fine.",               tint: "despair-tint" },
+      { text: "It wasn't supposed to be this.",   tint: "despair-tint" },
+      // Rage — KillCrazy, orange-red
+      { text: "WHY WON'T IT STOP.",               tint: "rage-tint" },
+      { text: "I WANT TO BREAK EVERYTHING.",      tint: "rage-tint" },
+      { text: "JUST LET ME OUT.",                 tint: "rage-tint" },
+      { text: "STOP LOOKING AT ME.",              tint: "rage-tint" },
+      { text: "I COULD SCREAM.",                  tint: "rage-tint" },
+      { text: "GET OUT OF MY HEAD.",              tint: "rage-tint" },
+      { text: "SHUT UP SHUT UP SHUT UP.",         tint: "rage-tint" },
+      { text: "I'M DONE.",                        tint: "rage-tint" },
+      { text: "Man up.",                          tint: "rage-tint" },
+      { text: "Stop that.",                       tint: "rage-tint" },
+      // Hatred — rage-tint colour, Getting Angry weight
+      { text: "I hate what I've become.",         tint: "rage-tint" },
+      { text: "I hate them.",                     tint: "rage-tint" },
+      { text: "They deserved it.",                tint: "rage-tint" },
+      { text: "I hate myself most of all.",       tint: "shame-tint" },
+      // Envy — Hundred Watt, green
+      { text: "Why do they get to be happy.",     tint: "envy-tint" },
+      { text: "Look at them. Just look.",         tint: "envy-tint" },
+      { text: "They never had to fight.",         tint: "envy-tint" },
+      { text: "It should have been me.",          tint: "envy-tint" },
+      { text: "Why not me.",                      tint: "envy-tint" },
+      // Shame — MTO Grunge Sans, purple
+      { text: "They all saw.",                    tint: "shame-tint" },
+      { text: "I knew they would find out.",      tint: "shame-tint" },
+      { text: "Don't look at me.",                tint: "shame-tint" },
+      { text: "I am disgusting.",                 tint: "shame-tint" },
+      { text: "I deserve this.",                  tint: "shame-tint" },
+      { text: "You would hate me if you knew.",   tint: "shame-tint" },
+      { text: "They know what I am.",             tint: "shame-tint" },
+      { text: "Who am I kidding?",                tint: "shame-tint" },
+      { text: "I\u2014",                          tint: "shame-tint" },
+      { text: "Oh. I'm having one of these.",     tint: "shame-tint" },
+      // System noise — Press Start 2P, dark terminal green
+      { text: "ERROR_NULL_POINTER",               tint: "system-tint" },
+      { text: "SEQUENCE_BREACH",                  tint: "rage-tint"   },
+      { text: "HEARTBEAT_LOST",                   tint: "system-tint" },
+      { text: "NEURAL_LINK_DEGRADED",             tint: "despair-tint"},
+      { text: "MEMORY_FAULT",                     tint: "system-tint" },
+      { text: "IDENTITY_CORRUPTED",               tint: "shame-tint"  },
+      { text: "CORE_INTEGRITY_FAIL",              tint: "rage-tint"   },
+      { text: "ENVY_LOOP_DETECTED",               tint: "envy-tint"   },
+      { text: "EMOTIONAL_OVERFLOW",               tint: "rage-tint"   },
+      { text: "SELF_DESTRUCT_PENDING",            tint: "despair-tint"},
+      { text: "RAGE_BUFFER_FULL",                 tint: "rage-tint"   },
+      { text: "SHAME_INDEX_MAX",                  tint: "shame-tint"  },
+      { text: "HATRED_PROCESS_RUNNING",           tint: "system-tint" },
+      { text: "TEMPORAL_SYNC_ERROR",              tint: "system-tint" },
+      { text: "INPUT_STREAM_CORRUPTED",           tint: "system-tint" },
+    ];
+
+
+    /* ── Shuffle Bag ───────────────────────────────────────────────
+       Fisher-Yates shuffle. draw() pops one item at a time.
+       Auto-refills + reshuffles when empty. Each item in the source
+       array appears exactly once per full cycle — no consecutive dupes.
+    ──────────────────────────────────────────────────────────────── */
+    function ShuffleBag(source) {
+      this._src = source;
+      this._bag = [];
+      this._fill = function () {
+        this._bag = [...this._src];
+        for (let i = this._bag.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [this._bag[i], this._bag[j]] = [this._bag[j], this._bag[i]];
+        }
+      };
+      this.draw = function () {
+        if (this._bag.length === 0) this._fill();
+        return this._bag.pop();
+      };
+      this._fill();
+    }
+
+    /* Background chaos spans — no consecutive repeats across 220 draws */
+    const bgBag = new ShuffleBag(BG_POOL);
+
+    /* Active monologue guard — tracks phrase texts currently on screen.
+       Shared by all 3 concurrent streams to block same-text overlaps. */
+    const _activeTexts = new Set();
+
+    const chaosContainer = document.getElementById('chaos-container');
+
+    for (let i = 0; i < 220; i++) {
+      const entry = bgBag.draw();
+      const span = document.createElement('span');
+      span.classList.add('vent-phrase');
+      if (entry.tint) span.classList.add(entry.tint);
+      span.innerText = entry.text;
+      span.style.left = `${Math.random() * 112 - 6}vw`;
+      span.style.top  = `${Math.random() * 112 - 6}vh`;
+      const rot = Math.random() > 0.90 ? 90 : (Math.random() * 50 - 25);
+      span.style.transform = `rotate(${rot}deg)`;
+      const depth = Math.random();
+      span.style.fontSize = `${depth * 4.5 + 0.4}rem`;
+      span.style.filter   = `blur(${(1 - depth) * 4.5}px)`;
+      span.style.opacity  = (depth * 0.32 + 0.015).toFixed(3);
+      chaosContainer.appendChild(span);
+    }
+
+    /* Parallax drift */
+    const bgNodes = Array.from(chaosContainer.children);
+    const bgData  = bgNodes.map(() => ({
+      baseX: null, baseY: null,
+      speedX: (Math.random() - 0.5) * 0.006,
+      speedY: (Math.random() - 0.5) * 0.004,
+      phase:  Math.random() * Math.PI * 2,
+    }));
+    requestAnimationFrame(() => {
+      bgNodes.forEach((n, i) => {
+        bgData[i].baseX = parseFloat(n.style.left);
+        bgData[i].baseY = parseFloat(n.style.top);
+      });
+      let t = 0;
+      function drift() {
+        t++;
+        bgNodes.forEach((n, i) => {
+          const d = bgData[i];
+          if (d.baseX === null) return;
+          n.style.left = `${d.baseX + Math.sin(t * d.speedX + d.phase) * 1.8}vw`;
+          n.style.top  = `${d.baseY + Math.cos(t * d.speedY + d.phase) * 1.2}vh`;
+        });
+        requestAnimationFrame(drift);
+      }
+      drift();
+    });
+
+    /* ===================================================
+       FLASH MONOLOGUE POOL (44 entries)
+       Every phrase has an explicit emotion — no plain white.
+       emotion: 'rage' | 'envy' | 'despair' | 'shame' | 'hatred' | 'fragment'
+    =================================================== */
+    const MONOLOGUE = [
+      // ── DESPAIR — UEE Disposable, #4488ff ──
+      { text: "My life is over.",                         size: 1.65, emotion: 'despair' },
+      { text: "I'll never see them again.",               size: 1.45, emotion: 'despair' },
+      { text: "It's been a while.",                       size: 1.15, emotion: 'despair' },
+      { text: "Fuck. I'm crying.",                        size: 1.6,  emotion: 'despair' },
+      { text: "I am so tired.",                           size: 1.3,  emotion: 'despair' },
+      { text: "I've already lost.",                       size: 1.4,  emotion: 'despair' },
+      { text: "Nobody's coming.",                         size: 1.3,  emotion: 'despair' },
+      { text: "Something is wrong with me.",              size: 1.35, emotion: 'despair' },
+      { text: "Make it stop. Please.",                    size: 1.5,  emotion: 'despair' },
+      { text: "I'm tired of pretending I'm fine.",        size: 1.25, emotion: 'despair' },
+      { text: "I used to be fine.",                       size: 1.2,  emotion: 'despair' },
+      { text: "Nothing changes.",                         size: 1.25, emotion: 'despair' },
+      { text: "I'll never\u2014",                         size: 1.6,  emotion: 'despair' },
+      { text: "Why? It's not like I'll ever\u2014",        size: 1.15, emotion: 'despair' },
+      { text: "This wasn't how it was supposed to go.",   size: 1.2,  emotion: 'despair' },
+      // ── RAGE — KillCrazy, #ff3300 ──
+      { text: "WHY WON'T IT STOP.",                       size: 1.7,  emotion: 'rage'   },
+      { text: "GET OUT OF MY HEAD.",                      size: 1.45, emotion: 'rage'   },
+      { text: "Stop that. Fucking\u2026 man up.",          size: 1.2,  emotion: 'rage'   },
+      { text: "I COULD SCREAM.",                          size: 1.6,  emotion: 'rage'   },
+      { text: "JUST LET ME OUT.",                         size: 1.5,  emotion: 'rage'   },
+      { text: "STOP LOOKING AT ME.",                      size: 1.4,  emotion: 'rage'   },
+      { text: "SHUT UP SHUT UP SHUT UP.",                 size: 1.75, emotion: 'rage'   },
+      { text: "I WANT TO BREAK EVERYTHING.",              size: 1.5,  emotion: 'rage'   },
+      // ── ENVY — Hundred Watt, #00e84e ──
+      { text: "Why do they get to be happy.",             size: 1.3,  emotion: 'envy'   },
+      { text: "It should have been me.",                  size: 1.2,  emotion: 'envy'   },
+      { text: "Look at them. Just look.",                 size: 1.2,  emotion: 'envy'   },
+      { text: "They never had to fight.",                 size: 1.25, emotion: 'envy'   },
+      { text: "Why not me.",                              size: 1.6,  emotion: 'envy'   },
+      { text: "They don't even try.",                    size: 1.15, emotion: 'envy'   },
+      // ── SHAME — MTO Grunge Sans, #dd33ff ──
+      { text: "They know what I am.",                     size: 1.55, emotion: 'shame'  },
+      { text: "Who am I kidding?",                        size: 1.2,  emotion: 'shame'  },
+      { text: "Oh. Here we go again.",                    size: 1.35, emotion: 'shame'  },
+      { text: "They all saw.",                            size: 1.2,  emotion: 'shame'  },
+      { text: "You would hate me if you knew.",           size: 1.15, emotion: 'shame'  },
+      { text: "\u2026I should stop saying that.",         size: 1.35, emotion: 'shame'  },
+      { text: "Don't look at me.",                        size: 1.3,  emotion: 'shame'  },
+      { text: "I am disgusting.",                         size: 1.4,  emotion: 'shame'  },
+      { text: "I deserve this.",                          size: 1.35, emotion: 'shame'  },
+      // ── HATRED — MTO Getting Angry, #ff1111 ──
+      { text: "I hate what I've become.",                 size: 1.3,  emotion: 'hatred' },
+      { text: "I hate them.",                             size: 1.2,  emotion: 'hatred' },
+      { text: "I hate myself most of all.",               size: 1.35, emotion: 'hatred' },
+      { text: "They deserved it.",                        size: 1.3,  emotion: 'hatred' },
+      // ── FRAGMENT / CLIMAX — MTO Getting Angry, red ──
+      // Weighted at 20% — jarring, sudden, full-screen
+      { text: "I\u2014",          size: 5.0,  emotion: 'fragment' },
+      { text: "I can't\u2014",    size: 4.2,  emotion: 'fragment' },
+      { text: "Why won't\u2014",  size: 3.8,  emotion: 'fragment' },
+    ];
+
+    const flashStage = document.getElementById('flash-container');
+
+    const EMOTION_CLASS = {
+      rage: 'is-rage', envy: 'is-envy', despair: 'is-despair',
+      shame: 'is-shame', hatred: 'is-hatred', fragment: 'is-fragment',
+    };
+
+    function randPos() {
+      /* Divide screen into a loose 3×3 grid, pick a cell, jitter within it.
+         This keeps concurrent phrases spread without strict logic. */
+      const col = Math.floor(Math.random() * 3);
+      const row = Math.floor(Math.random() * 3);
+      return {
+        x: 4  + col * 28 + Math.random() * 22,
+        y: 6  + row * 26 + Math.random() * 18,
+      };
+    }
+
+    function flashPhrase(entry) {
+      const isClimax = entry.emotion === 'fragment';
+
+      /* Timing: climax = instant punch, long hold, slow fade.
+         Standard = smooth random in/hold/out. */
+      const fadeIn  = isClimax ? 60   : 280 + Math.random() * 300;
+      const hold    = isClimax ? 1800 + Math.random() * 1200 : 900 + Math.random() * 1400;
+      const fadeOut = isClimax ? 1400 : 380 + Math.random() * 300;
+
+      return new Promise(resolve => {
+        const el = document.createElement('span');
+        el.classList.add('flash-phrase');
+        if (entry.emotion && EMOTION_CLASS[entry.emotion]) {
+          el.classList.add(EMOTION_CLASS[entry.emotion]);
+        }
+        el.textContent = entry.text;
+        _activeTexts.add(entry.text); /* register as active */
+
+        /* Responsive font size: 1.15× scale, clamp() prevents overflow
+           on smaller laptop screens without killing the big climax effect */
+        const scaled = entry.size * 1.15;
+        el.style.fontSize =
+          `clamp(${(scaled * 0.55).toFixed(2)}rem, ${(scaled * 1.5).toFixed(1)}vw, ${scaled.toFixed(2)}rem)`;
+
+        const pos = randPos();
+        el.style.left = `${pos.x}vw`;
+        el.style.top  = `${pos.y}vh`;
+        const tilt = isClimax ? 0
+          : entry.emotion === 'rage'  ? (Math.random() - 0.5) * 22
+          : entry.emotion === 'shame' ? (Math.random() - 0.5) * 12
+          : (Math.random() - 0.5) * 8;
+        el.style.transform = `rotate(${tilt}deg)`;
+        flashStage.appendChild(el);
+
+        if (isClimax) {
+          /* CSS @keyframes punch — no JS opacity for fade-in */
+          el.classList.add('climax-flash');
+          setTimeout(() => {
+            el.style.transition = `opacity ${fadeOut}ms ease`;
+            el.style.opacity = '0';
+            setTimeout(() => { _activeTexts.delete(entry.text); el.remove(); resolve(); }, fadeOut);
+          }, hold);
+        } else {
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            el.style.transition = `opacity ${fadeIn}ms ease`;
+            el.style.opacity = '1';
+          }));
+          setTimeout(() => {
+            el.style.transition = `opacity ${fadeOut}ms ease`;
+            el.style.opacity = '0';
+            setTimeout(() => { _activeTexts.delete(entry.text); el.remove(); resolve(); }, fadeOut);
+          }, fadeIn + hold);
+        }
+      });
+    }
+
+    /* ── Monologue — Shuffle Bag + active-text guard ──────────────────
+       Each pool gets its own ShuffleBag (Fisher-Yates, no repeats).
+       pickSafe() tries up to pool.length times to find an entry that
+       isn't currently on screen. Falls back if all entries are active.
+    ───────────────────────────────────────────────────── */
+    const _standard = MONOLOGUE.filter(e => e.emotion !== 'fragment');
+    const _climax   = MONOLOGUE.filter(e => e.emotion === 'fragment');
+
+    const _bagStd  = new ShuffleBag(_standard);
+    const _bagFrag = new ShuffleBag(_climax);
+
+    function pickSafe() {
+      const useClimax = Math.random() < 0.20 && _climax.length > 0;
+      const bag  = useClimax ? _bagFrag : _bagStd;
+      const pool = useClimax ? _climax  : _standard;
+
+      /* Try each entry in the bag; if it's already visible, skip it */
+      for (let t = 0; t < pool.length; t++) {
+        const entry = bag.draw();
+        if (!_activeTexts.has(entry.text)) return entry;
+        bag._bag.unshift(entry); /* push back — not consumed */
+      }
+      return bag.draw(); /* all entries active (rare) — fire anyway */
+    }
+
+    function startStream(streamIndex) {
+      function fire() {
+        flashPhrase(pickSafe()); /* fire-and-forget */
+        const gap = 1200 + Math.random() * 3800; // 1.2 – 5 s
+        setTimeout(fire, gap);
+      }
+      const stagger = streamIndex * (800 + Math.random() * 1600);
+      setTimeout(fire, stagger);
+    }
+
+    /* Start 3 concurrent streams */
+    setTimeout(() => {
+      for (let i = 0; i < 3; i++) startStream(i);
+    }, 300);
+
+    /* ── Start animated vent-text ── */
+    startVentText('ventBg');
+
+    /* Live clock */
+    const timeEl = document.getElementById('sysTime');
+    function tick() {
+      const now = new Date();
+      timeEl.textContent = `SYS_TIME: ${
+        String(now.getHours()).padStart(2,'0')}:${
+        String(now.getMinutes()).padStart(2,'0')}:${
+        String(now.getSeconds()).padStart(2,'0')}`;
+    }
+    tick(); setInterval(tick, 1000);
+
+    /* ── Effect 3: System Tear ──────────────────────────────────
+       Randomised 3–7 s interval. When triggered, adds .system-tear
+       to body for exactly 150 ms, then queues the next random tear.
+       Brain can never brace for it — the timing is never the same.
+    ─────────────────────────────────────────────────────── */
+    (function initSystemTear() {
+      const tearSlice = document.querySelector('.system-tear-slice');
+
+      function scheduleTear() {
+        const delay = 3000 + Math.random() * 4000; /* 3 000 – 7 000 ms */
+        setTimeout(fireTear, delay);
+      }
+
+      function fireTear() {
+        /* Randomise the vertical position of the slice (20 – 68% down) */
+        if (tearSlice) tearSlice.style.top = `${20 + Math.random() * 48}%`;
+
+        document.body.classList.add('system-tear');
+        setTimeout(() => {
+          document.body.classList.remove('system-tear');
+          scheduleTear(); /* queue the next unpredictable tear */
+        }, 150);
+      }
+
+      scheduleTear(); /* first tear */
+    })();
+
+    /* ── Quick-Launch: Initialize_Run ─────────────────────────────────
+       Connects directly to FastAPI on port 8000 with default params.
+       Bypasses settings.html for a one-click cold start.
+
+       Flow:
+         click → CONNECTING... → POST /generate-level (default config)
+              → console.log beatmap → save localStorage
+              → fade to black (0.9 s) → play.html
+
+       Error path (backend offline / timeout / HTTP error):
+         button shows error text → falls through to settings.html after 2 s
+    ─────────────────────────────────────────────────────── */
+    (function initQuickLaunch() {
+      const btn  = document.getElementById('btnStart');
+      const veil = document.getElementById('transition-veil');
+      if (!btn || !veil) return;
+
+      /* Default level config — same as settings.html pre-filled values */
+      const DEFAULT_CONFIG = {
+        node_count:    20,
+        base_tempo_ms: 500,
+        difficulty:    'medium',
+        tolerance_ms:  50,
+        seed:          null,
+      };
+
+      btn.addEventListener('click', async function (e) {
+        e.preventDefault(); /* intercept the href="settings.html" */
+
+        btn.textContent = 'CONNECTING…';
+        btn.classList.add('processing');
+
+        /* 6-second hard timeout via AbortController */
+        const ctrl    = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 6000);
+
+        try {
+          const res = await fetch('http://127.0.0.1:8000/generate-level', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(DEFAULT_CONFIG),
+            signal:  ctrl.signal,
+          });
+          clearTimeout(timeout);
+
+          if (!res.ok) {
+            const detail = await res.json().catch(() => ({}));
+            throw new Error(detail.detail || `HTTP ${res.status}`);
+          }
+
+          const data = await res.json();
+
+          /* ✔ Beatmap received — log for dev verification (F12 → Console) */
+          console.log(
+            `%c[Titan] Beatmap received — ${data.nodes.length} nodes`,
+            'color:#00ff88;font-weight:bold;'
+          );
+          console.log(data);
+
+          /* Save everything play.html needs */
+          localStorage.setItem('titan_level_id', data.level_id);
+          localStorage.setItem('titan_beatmap',  JSON.stringify(data.nodes));
+          localStorage.setItem('titan_config',   JSON.stringify({
+            tolerance_ms:  DEFAULT_CONFIG.tolerance_ms,
+            base_tempo_ms: DEFAULT_CONFIG.base_tempo_ms,
+            difficulty:    DEFAULT_CONFIG.difficulty,
+            node_count:    data.nodes.filter(n => !n.is_alt_branch).length,
+          }));
+
+          btn.textContent = 'SEQUENCE_COMPILED';
+
+          /* Fade screen to black then redirect */
+          veil.classList.add('active');
+          setTimeout(() => { window.location.href = 'play.html'; }, 950);
+
+        } catch (err) {
+          clearTimeout(timeout);
+          const isTimeout = err.name === 'AbortError';
+          console.error('[Titan] Quick-launch failed:', err);
+
+          btn.classList.remove('processing');
+          btn.classList.add('error-state');
+          btn.textContent = isTimeout ? 'BACKEND_TIMEOUT' : 'BACKEND_OFFLINE';
+
+          /* After 2 s fall through to settings.html */
+          setTimeout(() => { window.location.href = 'settings.html'; }, 2000);
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>

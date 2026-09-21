@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Titan — Operation Active</title>
+  <meta name="description" content="Project Titan: active operation. React to the incoming node sequence." />
+  <link rel="stylesheet" href="static/style.css" />
+  <style>
+    /* ── Screen shake (CSS body animation) ── */
+    @keyframes screenshake {
+      0%,100% { transform: translate(0,0); }
+      10%  { transform: translate(-5px, 2px);  }
+      20%  { transform: translate( 4px,-4px);  }
+      30%  { transform: translate(-4px, 3px);  }
+      40%  { transform: translate( 5px,-2px);  }
+      50%  { transform: translate(-3px, 4px);  }
+      60%  { transform: translate( 4px,-3px);  }
+      70%  { transform: translate(-3px, 2px);  }
+      80%  { transform: translate( 3px,-4px);  }
+      90%  { transform: translate(-2px, 3px);  }
+    }
+    body.shake { animation: screenshake 0.35s ease-out; }
+
+    /* ── Red miss flash overlay ── */
+    #missFlash {
+      position: fixed; inset: 0; z-index: 9998;
+      background: rgba(232,32,32,0);
+      pointer-events: none;
+      transition: background 0.04s linear;
+    }
+    #missFlash.active { background: rgba(232,32,32,0.52); }
+  </style>
+</head>
+<body>
+
+  <!-- ░░ GAME CANVAS ░░ -->
+  <canvas id="gameCanvas" aria-label="Project Titan game canvas"></canvas>
+
+  <!-- ░░ HUD OVERLAY ░░ -->
+  <div class="hud" aria-hidden="true">
+    <div class="hud-top">
+      <span class="hud-timer" id="hudValue">VAL: --</span>
+      <span class="hud-progress" id="hudProgress">0/0</span>
+    </div>
+
+    <!-- Balance Factor display -->
+    <div class="hud-combo" id="hudBalance" style="opacity:1;">
+      <div class="combo-num" id="balanceValue">0</div>
+      <div class="combo-lbl">BALANCE FACTOR</div>
+    </div>
+
+    <!-- BFS Ping Cooldown -->
+    <div class="hud-ping" id="hudPing" style="position: absolute; bottom: 80px; left: 28px; color: #fff; font-family: Space Mono; font-size: 10px; letter-spacing: 2px;">
+      BFS PING: <span id="pingStatus" style="color: #00ff88;">READY [SPACE]</span>
+    </div>
+  </div>
+
+  <!-- ░░ KEY INDICATORS ░░ -->
+  <div class="hud-keys" aria-hidden="true">
+    <div class="key-ind" id="key-a">A (ROTATE L)</div>
+    <div class="key-ind" id="key-w" style="min-width:90px;">W (CLIMB)</div>
+    <div class="key-ind" id="key-d">D (ROTATE R)</div>
+  </div>
+
+  <!-- ░░ VERDICT POP-UP ░░ -->
+  <div id="verdictPopup" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- ░░ NO-BEATMAP ERROR ░░ -->
+  <div id="noBeatmap" role="alert">
+    <h2>NO_LEVEL_DATA_FOUND</h2>
+    <p>
+      No beatmap has been generated. Please configure and generate a level
+      before initiating an operation.
+    </p>
+    <a href="settings.html" class="btn" style="pointer-events:all;">GO TO SETTINGS</a>
+  </div>
+
+  <!-- ░░ RESULTS OVERLAY ░░ -->
+  <div id="resultsOverlay" role="dialog" aria-modal="true" aria-label="Operation results">
+    <div class="results-panel">
+
+      <div class="result-status fail" id="resultStatus">SEQUENCE_FAILED</div>
+
+      <div class="result-score-num" id="resultScore">0</div>
+      <div class="result-score-lbl">OPERATION SCORE</div>
+
+      <div class="result-stats">
+        <div class="stat-box">
+          <div class="stat-val" id="resultAccuracy">0%</div>
+          <div class="stat-lbl">PATH ACCURACY</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="resultHits">0</div>
+          <div class="stat-lbl">NODES CLEARED</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="resultMisses">0</div>
+          <div class="stat-lbl">ERRORS</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="resultCombo" style="color: #e82020; font-size: 14px;"></div>
+          <div class="stat-lbl">DEATH CAUSE</div>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn" id="retryBtn">RETRY</button>
+        <a href="settings.html" class="btn btn-white btn-sm">RECONFIGURE</a>
+        <a href="index.html"    class="btn btn-white btn-sm">MAIN TERMINAL</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="missFlash" aria-hidden="true"></div>
+
+  <script src="static/game.js"></script>
+</body>
+</html>

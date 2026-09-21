@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Titan — System Parameters</title>
+  <meta name="description" content="Configure your Project Titan operation parameters before initiating the sequence." />
+  <link rel="stylesheet" href="static/style.css" />
+  <script src="static/vent.js"></script>
+  <style>
+    body.scrollable { overflow-y: auto; }
+  </style>
+</head>
+<body class="scrollable">
+
+  <!-- ░░ VENT ART BACKGROUND ░░ -->
+  <div class="vent-bg" id="ventBg" aria-hidden="true"></div>
+
+  <!-- ░░ SETTINGS PANEL ░░ -->
+  <div class="settings-wrap">
+    <div class="settings-panel" role="main">
+
+      <p class="settings-eyebrow">OPERATION_PARAMETERS // CLEARANCE_LEVEL_5</p>
+      <h1 class="settings-title glitch" data-text="SYSTEM SETTINGS">SYSTEM SETTINGS</h1>
+
+      <form id="settingsForm" novalidate>
+
+        <!-- Node Count -->
+        <div class="setting-row">
+          <label class="setting-label" for="nodeCount">
+            NODE COUNT
+            <span class="setting-val" id="nodeCountVal">20</span>
+          </label>
+          <input
+            type="range" id="nodeCount" name="node_count"
+            min="5" max="100" value="20" step="1"
+            aria-label="Number of nodes in the level"
+          />
+          <p class="setting-desc">
+            Total nodes in the main chain. Higher counts = longer, more complex sequences.
+          </p>
+        </div>
+
+        <!-- Base Tempo -->
+        <div class="setting-row">
+          <label class="setting-label" for="baseTempo">
+            BASE TEMPO (ms)
+            <span class="setting-val" id="baseTempoVal">500ms</span>
+          </label>
+          <input
+            type="range" id="baseTempo" name="base_tempo_ms"
+            min="150" max="1500" value="500" step="50"
+            aria-label="Base time between nodes in milliseconds"
+          />
+          <p class="setting-desc">
+            Gap between nodes at ×1.0 tempo. Lower = faster baseline. CHASER/BLOCKADE mods scale this.
+          </p>
+        </div>
+
+        <!-- Tolerance -->
+        <div class="setting-row">
+          <label class="setting-label" for="tolerance">
+            HIT TOLERANCE (ms)
+            <span class="setting-val" id="toleranceVal">±50ms</span>
+          </label>
+          <input
+            type="range" id="tolerance" name="tolerance_ms"
+            min="20" max="200" value="50" step="5"
+            aria-label="Maximum timing error allowed for a hit"
+          />
+          <p class="setting-desc">
+            Maximum timing delta for a valid HIT. Decrease for a brutally strict run.
+          </p>
+        </div>
+
+        <hr class="settings-hr" />
+
+        <!-- Difficulty -->
+        <div class="setting-row">
+          <label class="setting-label" for="difficulty">
+            DIFFICULTY
+          </label>
+          <select id="difficulty" name="difficulty" aria-label="Difficulty preset">
+            <option value="easy">EASY — CHASER_INTERVAL: 8, BLOCKADE: 10</option>
+            <option value="medium" selected>MEDIUM — CHASER_INTERVAL: 5, BLOCKADE: 8</option>
+            <option value="hard">HARD — CHASER_INTERVAL: 3, BLOCKADE: 5</option>
+          </select>
+          <p class="setting-desc">
+            Controls how frequently CHASER, BLOCKADE, and DIVERTER nodes are injected into the chain.
+          </p>
+        </div>
+
+        <!-- Seed -->
+        <div class="setting-row">
+          <label class="setting-label" for="seed">
+            RNG SEED
+            <span class="setting-val" id="seedHint">RANDOM</span>
+          </label>
+          <input
+            type="number" id="seed" name="seed"
+            placeholder="Leave blank for random"
+            min="0" max="999999"
+            aria-label="Optional seed for deterministic level generation"
+          />
+          <p class="setting-desc">
+            Optional integer seed. Same seed + parameters = identical level every time (useful for leaderboards).
+          </p>
+        </div>
+
+        <div class="settings-actions">
+          <button type="submit" class="btn" id="generateBtn">GENERATE LEVEL</button>
+          <a href="index.html" class="btn btn-white btn-sm">ABORT</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ░░ STATUS BAR ░░ -->
+  <div class="status-bar" aria-live="polite">
+    <span>TITAN_BACKEND: <span id="backendStatus">CHECKING...</span></span>
+    <span id="statusMsg"></span>
+    <span>127.0.0.1:8000</span>
+  </div>
+
+  <script>
+    /* ── Animated vent-text ── */
+    startVentText('ventBg');
+
+
+    /* ── Live slider values ── */
+    const sliders = {
+      nodeCount: { el: document.getElementById('nodeCount'), out: document.getElementById('nodeCountVal'), fmt: v => v },
+      baseTempo: { el: document.getElementById('baseTempo'), out: document.getElementById('baseTempoVal'), fmt: v => `${v}ms` },
+      tolerance: { el: document.getElementById('tolerance'), out: document.getElementById('toleranceVal'), fmt: v => `±${v}ms` },
+    };
+
+    Object.values(sliders).forEach(({ el, out, fmt }) => {
+      out.textContent = fmt(el.value);
+      el.addEventListener('input', () => { out.textContent = fmt(el.value); });
+    });
+
+    /* ── Seed hint ── */
+    const seedEl   = document.getElementById('seed');
+    const seedHint = document.getElementById('seedHint');
+    seedEl.addEventListener('input', () => {
+      seedHint.textContent = seedEl.value.trim() ? seedEl.value.trim() : 'RANDOM';
+    });
+
+    /* ── Backend health check with terminal-cursor pulse ── */
+    const backendStatus = document.getElementById('backendStatus');
+    const statusMsg     = document.getElementById('statusMsg');
+
+    async function checkBackend() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/health');
+        if (res.ok) {
+          backendStatus.textContent = 'ONLINE';
+          backendStatus.className   = 'online';
+        } else throw new Error();
+      } catch {
+        backendStatus.textContent = 'OFFLINE';
+        backendStatus.className   = 'offline';
+      }
+    }
+    checkBackend();
+    setInterval(checkBackend, 5000); /* re-check every 5 s */
+
+    /* ── Form submit → /generate-level ── */
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById('generateBtn');
+      btn.textContent = 'COMPILING...';
+      btn.disabled = true;
+      statusMsg.textContent = 'CONTACTING_BACKEND...';
+
+      const seedVal = seedEl.value.trim();
+      const payload = {
+        node_count:    parseInt(sliders.nodeCount.el.value),
+        base_tempo_ms: parseInt(sliders.baseTempo.el.value),
+        difficulty:    document.getElementById('difficulty').value,
+        tolerance_ms:  parseInt(sliders.tolerance.el.value),
+        seed:          seedVal ? parseInt(seedVal) : null,
+      };
+
+      try {
+        const res = await fetch('http://127.0.0.1:8000/generate-level', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        /* Store everything the play page needs */
+        localStorage.setItem('titan_level_id', data.level_id);
+        localStorage.setItem('titan_beatmap',  JSON.stringify(data.nodes));
+        localStorage.setItem('titan_config',   JSON.stringify({
+          tolerance_ms:  payload.tolerance_ms,
+          base_tempo_ms: payload.base_tempo_ms,
+          difficulty:    payload.difficulty,
+          node_count:    data.nodes.filter(n => !n.is_alt_branch).length,
+        }));
+
+        statusMsg.textContent = `LEVEL_COMPILED // ${data.nodes.length}_NODES`;
+        setTimeout(() => { window.location.href = 'play.html'; }, 400);
+
+      } catch (err) {
+        statusMsg.textContent = `ERROR: ${err.message}`;
+        btn.textContent = 'GENERATE LEVEL';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
