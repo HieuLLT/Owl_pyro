@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Titan &#8212; Neural Rhythmic Assault System</title>
+  <meta name="description" content="Project Titan: a glitch-core rhythm puzzle game built on dynamic data structures. React. Survive. Conquer." />
+  <link rel="stylesheet" href="static/style.css" />
+  <script src="static/vent.js"></script>
+  
+</head>
+<body>
+
+  <div class="vent-bg" id="ventBg" aria-hidden="true"></div>
+
+  <!-- Vignette: darkens edges, keeps eyes locked to center -->
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- System Tear slice: JS repositions + body.system-tear animates -->
+  <div class="system-tear-slice" aria-hidden="true"></div>
+
+  <svg style="display:none;" aria-hidden="true">
+    <filter id="titan-static" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+    </filter>
+  </svg>
+
+  <div class="static-noise"  aria-hidden="true"></div>
+  <div class="crt-scanlines" aria-hidden="true"></div>
+  <div id="chaos-container"  aria-hidden="true"></div>
+  <div id="flash-container"  aria-live="polite"></div>
+
+  <!-- Transition veil: JS activates this to fade screen to black before redirect -->
+  <div id="transition-veil" aria-hidden="true"></div>
+
+  <nav class="menu-actions" aria-label="Main menu">
+    <a href="settings.html" class="metal-btn"           id="btnStart">Initialize_Run</a>
+    <a href="settings.html" class="metal-btn secondary" id="btnSettings">System_Config</a>
+  </nav>
+
+  <p style="position:fixed; bottom: 85px; width:100%; text-align:center; font-size:9px; color:rgba(255,255,255,0.4); letter-spacing:1px; z-index:200;">CONTENT WARNING: Themes of despair, emotional breakdown, and self-harm-adjacent language.</p>
+
+  <footer class="index-footer" aria-label="System info">
+    <span>TITAN_OS v2.7.0 // BACKEND_LINK: 127.0.0.1:8000</span>
+    <span id="sysTime">&#8212;</span>
+    <span>SEQUENCE_ENGINE: ONLINE</span>
+  </footer>
+
+  <script src="static/atmosphere.js"></script>
+  <script>
+    (function initQuickLaunch() {
+      const btn  = document.getElementById('btnStart');
+      const veil = document.getElementById('transition-veil');
+      if (!btn || !veil) return;
+
+      btn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        btn.textContent = 'CONNECTING…';
+        btn.classList.add('processing');
+
+        const ctrl = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 6000);
+
+        try {
+          const res = await fetch('/api/new-game', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({seed: null}),
+            signal: ctrl.signal,
+          });
+          clearTimeout(timeout);
+
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+          const data = await res.json();
+          sessionStorage.setItem('titan_run_id', data.run_id);
+
+          btn.textContent = 'SEQUENCE_COMPILED';
+          veil.classList.add('active');
+          setTimeout(() => { window.location.href = 'play.html'; }, 950);
+
+        } catch (err) {
+          clearTimeout(timeout);
+          btn.classList.remove('processing');
+          btn.classList.add('error-state');
+          btn.textContent = 'BACKEND_OFFLINE';
+          setTimeout(() => { window.location.href = 'settings.html'; }, 2000);
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>

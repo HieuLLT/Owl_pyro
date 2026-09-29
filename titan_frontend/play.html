@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Titan — TERMINAL ATTRITION</title>
+  <link rel="stylesheet" href="static/style.css" />
+</head>
+<body>
+
+  <!-- Atmosphere Layers -->
+  <div class="vent-bg" id="ventBg" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="system-tear-slice" aria-hidden="true"></div>
+  
+  <svg style="display:none;" aria-hidden="true">
+    <filter id="titan-static" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+    </filter>
+  </svg>
+  <div class="static-noise" aria-hidden="true"></div>
+  <div class="crt-scanlines" aria-hidden="true"></div>
+  <div id="chaos-container" aria-hidden="true"></div>
+
+  <!-- Main Game UI -->
+  <div class="game-hud">
+    <div class="hud-top">
+      <div id="cycleLabel">CYCLE --</div>
+      <div id="drainLabel" class="drain-warning">NEXT DRAIN --</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-container">
+      <div class="stat-bar" id="bar-memory">
+        <div class="stat-header">
+          <span class="stat-label">MEMORY</span>
+          <span class="stat-readout">--</span>
+        </div>
+        <div class="stat-track">
+          <div class="stat-fill"></div>
+        </div>
+      </div>
+      
+      <div class="stat-bar" id="bar-integrity">
+        <div class="stat-header">
+          <span class="stat-label">INTEGRITY</span>
+          <span class="stat-readout">--</span>
+        </div>
+        <div class="stat-track">
+          <div class="stat-fill"></div>
+        </div>
+      </div>
+      
+      <div class="stat-bar" id="bar-willpower">
+        <div class="stat-header">
+          <span class="stat-label">WILLPOWER</span>
+          <span class="stat-readout">--</span>
+        </div>
+        <div class="stat-track">
+          <div class="stat-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Panel -->
+    <div id="eventPanel" class="event-panel">
+      <!-- Error banner for network failures -->
+      <div id="errorBanner" style="display: none;" class="error-banner"></div>
+      
+      <!-- Willpower Override Banner -->
+      <div id="overrideBanner" style="display: none;" class="override-banner">CHOICE_OVERRIDDEN // WILL_UNAVAILABLE</div>
+      
+      <div id="eventText" class="event-text">INITIALIZING SEQUENCE...</div>
+      <div id="choiceRow" class="choice-row">
+        <!-- Buttons injected by game.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Overlay (Repurposed) -->
+  <div id="resultsOverlay">
+    <div class="results-panel">
+      <div id="resultStatus" class="result-status">SYSTEM COLLAPSE</div>
+      
+      <div class="result-score-lbl">CYCLES SURVIVED</div>
+      <div id="resultScore" class="result-score-num">--</div>
+      <div id="resultBest" class="result-score-lbl" style="margin-top: -30px; margin-bottom: 30px;">BEST: --</div>
+      
+      <div class="result-score-lbl">CAUSE OF FAILURE</div>
+      <div id="resultCause" class="result-cause" style="color:var(--red); font-size:14px; font-weight:700; margin-top:-20px; margin-bottom:30px;">--</div>
+
+      <div class="result-stats">
+        <div class="stat-box"><div class="stat-val" id="finalMem">--</div><div class="stat-lbl">MEM</div></div>
+        <div class="stat-box"><div class="stat-val" id="finalInt">--</div><div class="stat-lbl">INT</div></div>
+        <div class="stat-box"><div class="stat-val" id="finalWill">--</div><div class="stat-lbl">WILL</div></div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-white" id="btnRetry">REBOOT_SEQUENCE</button>
+        <button class="btn" id="btnMenu">MAIN_TERMINAL</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/atmosphere.js"></script>
+  <script type="module">
+    import { TerminalGame } from './static/game.js';
+    TerminalGame.init();
+    
+    document.getElementById('btnRetry').addEventListener('click', () => {
+      sessionStorage.removeItem('titan_run_id');
+      window.location.reload();
+    });
+    
+    document.getElementById('btnMenu').addEventListener('click', () => {
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

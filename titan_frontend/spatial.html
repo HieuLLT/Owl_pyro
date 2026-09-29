@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TERMINAL ATTRITION — Spatial Cross-Section real-time escape game. Navigate a 3D matrix by rotating your view plane to escape AI-driven chasers.">
+  <title>TERMINAL ATTRITION — SPATIAL ENGINE</title>
+  <link rel="stylesheet" href="static/style.css" />
+  <style>
+    /* ── Spatial page overrides ───────────────────────────────────────── */
+
+    #spatial-root {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    /* Title bar */
+    #spatial-title {
+      font-family: var(--font-system, 'Press Start 2P', monospace);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--red);
+      text-shadow: 0 0 14px var(--red-glow, rgba(232,32,32,0.55));
+      margin-bottom: 10px;
+      user-select: none;
+    }
+
+    /* Canvas container */
+    #canvas-wrap {
+      position: relative;
+      border: 1px solid var(--red-border, rgba(232,32,32,0.35));
+      box-shadow:
+        0 0 40px rgba(232,32,32,0.12),
+        0 0 4px  rgba(232,32,32,0.3) inset;
+    }
+
+    #gameCanvas {
+      display: block;
+      background: #030303;
+    }
+
+    /* Plane indicator chip — top-left of canvas */
+    #plane-chip {
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      font-family: var(--font, 'Space Mono', monospace);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      padding: 3px 10px;
+      border-radius: 2px;
+      pointer-events: none;
+      transition: background 0.12s, color 0.12s;
+      z-index: 20;
+    }
+    #plane-chip.xy { background: rgba(0,255,136,0.12); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+    #plane-chip.zy { background: rgba(176,96,255,0.12); color: #b060ff; border: 1px solid rgba(176,96,255,0.3); }
+
+    /* Mobile controls */
+    #mobile-controls {
+      display: none;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 700px) {
+      #mobile-controls { display: flex; }
+    }
+
+    .mobile-btn {
+      font-family: var(--font, 'Space Mono', monospace);
+      font-size: 12px;
+      padding: 8px 16px;
+      background: rgba(232,32,32,0.08);
+      color: var(--white);
+      border: 1px solid var(--red-border, rgba(232,32,32,0.35));
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: background 0.1s;
+    }
+    .mobile-btn:active { background: rgba(232,32,32,0.22); }
+
+    /* Controls legend */
+    #controls-legend {
+      margin-top: 10px;
+      font-family: var(--font, 'Space Mono', monospace);
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 0.10em;
+      user-select: none;
+    }
+    #controls-legend span { color: #555; }
+
+    /* Loading screen */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #030303;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s;
+    }
+    #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+
+    #loading-title {
+      font-family: var(--font-system, 'Press Start 2P', monospace);
+      font-size: 13px;
+      color: var(--red);
+      text-shadow: 0 0 20px rgba(232,32,32,0.6);
+      letter-spacing: 0.2em;
+      margin-bottom: 24px;
+    }
+
+    #loading-bar-wrap {
+      width: 240px;
+      height: 4px;
+      background: #111;
+      border: 1px solid rgba(232,32,32,0.2);
+      overflow: hidden;
+    }
+    #loading-bar {
+      height: 100%;
+      width: 0;
+      background: var(--red);
+      transition: width 0.3s linear;
+    }
+    #loading-status {
+      font-family: var(--font, 'Space Mono', monospace);
+      font-size: 10px;
+      color: #444;
+      margin-top: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    /* End-game overlay message (outside canvas, for screen-reader) */
+    #end-message {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #end-panel {
+      background: rgba(3,3,3,0.92);
+      border: 1px solid var(--red-border);
+      padding: 36px 48px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(232,32,32,0.2);
+    }
+    #end-panel h2 {
+      font-family: var(--font-system, 'Press Start 2P', monospace);
+      font-size: 18px;
+      letter-spacing: 0.15em;
+      margin-bottom: 16px;
+    }
+    #end-panel h2.won  { color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.5); }
+    #end-panel h2.lost { color: var(--red); text-shadow: 0 0 20px rgba(232,32,32,0.5); }
+    #end-panel p { font-size: 12px; color: #666; margin-bottom: 24px; font-family: var(--font); }
+    #end-panel button {
+      font-family: var(--font-system, 'Press Start 2P', monospace);
+      font-size: 10px;
+      padding: 10px 20px;
+      margin: 0 6px;
+      background: transparent;
+      border: 1px solid var(--red-border);
+      color: var(--white);
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      transition: background 0.1s;
+    }
+    #end-panel button:hover { background: rgba(232,32,32,0.15); }
+  </style>
+</head>
+<body>
+
+  <!-- Atmosphere layers (preserved from project Titan) -->
+  <div class="vent-bg" id="ventBg" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="system-tear-slice" aria-hidden="true"></div>
+
+  <svg style="display:none;" aria-hidden="true">
+    <filter id="titan-static" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+    </filter>
+  </svg>
+  <div class="static-noise" aria-hidden="true"></div>
+  <div class="crt-scanlines" aria-hidden="true"></div>
+  <div id="chaos-container" aria-hidden="true"></div>
+
+  <!-- Loading screen -->
+  <div id="loading-screen" role="status" aria-label="Loading spatial engine">
+    <div id="loading-title">SPATIAL ENGINE</div>
+    <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+    <div id="loading-status">INITIALISING 3D MATRIX...</div>
+  </div>
+
+  <!-- Main spatial game view -->
+  <div id="spatial-root">
+    <div id="spatial-title">[ SPATIAL CROSS-SECTION ENGINE ]&nbsp;&nbsp;//&nbsp;&nbsp;TERMINAL ATTRITION</div>
+
+    <div id="canvas-wrap">
+      <div id="plane-chip" class="xy">VIEW A — XY</div>
+      <canvas id="gameCanvas" width="780" height="580"
+              aria-label="3D spatial cross-section game — use WASD to move, SHIFT to rotate view plane"></canvas>
+    </div>
+
+    <!-- Mobile controls -->
+    <div id="mobile-controls">
+      <button class="mobile-btn" id="btnUp"    aria-label="Move up">↑</button>
+      <button class="mobile-btn" id="btnLeft"  aria-label="Move left">←</button>
+      <button class="mobile-btn" id="btnDown"  aria-label="Move down">↓</button>
+      <button class="mobile-btn" id="btnRight" aria-label="Move right">→</button>
+      <button class="mobile-btn" id="btnSwapPlane" aria-label="Rotate view plane">⟳ ROTATE</button>
+    </div>
+
+    <div id="controls-legend">
+      <span>W/A/S/D</span> or <span>ARROW KEYS</span> — move&nbsp;&nbsp;|&nbsp;&nbsp;
+      <span>SHIFT / P / SPACE</span> — rotate view plane&nbsp;&nbsp;|&nbsp;&nbsp;
+      <span>R</span> — restart&nbsp;&nbsp;|&nbsp;&nbsp;
+      <span>ESC</span> — menu
+    </div>
+  </div>
+
+  <!-- End-game overlay (DOM-level, for accessibility) -->
+  <div id="end-message" role="dialog" aria-modal="true" aria-live="assertive">
+    <div id="end-panel">
+      <h2 id="end-heading"></h2>
+      <p  id="end-sub"></p>
+      <button id="btnRestart">RESTART</button>
+      <button id="btnMenu">MENU</button>
+    </div>
+  </div>
+
+  <!-- Atmosphere JS (vent art, emotion fonts, glitch) -->
+  <script src="static/atmosphere.js"></script>
+
+  <!-- Spatial Engine (ES Module) -->
+  <script type="module">
+    import { SpatialEngine } from './static/engine/spatial_engine.js';
+
+    const canvas      = document.getElementById('gameCanvas');
+    const planeChip   = document.getElementById('plane-chip');
+    const loadScreen  = document.getElementById('loading-screen');
+    const loadBar     = document.getElementById('loading-bar');
+    const loadStatus  = document.getElementById('loading-status');
+    const endMessage  = document.getElementById('end-message');
+    const endHeading  = document.getElementById('end-heading');
+    const endSub      = document.getElementById('end-sub');
+
+    let engine = null;
+
+    // ── Responsive canvas resize ─────────────────────────────────────────────
+    function resizeCanvas() {
+      const maxW = Math.min(window.innerWidth  - 24, 820);
+      const maxH = Math.min(window.innerHeight - 180, 600);
+      canvas.width  = maxW;
+      canvas.height = maxH;
+      if (engine) engine.onResize();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ── Loading animation ────────────────────────────────────────────────────
+    function setLoadProgress(pct, msg) {
+      loadBar.style.width    = `${pct}%`;
+      loadStatus.textContent = msg;
+    }
+
+    // ── Boot ─────────────────────────────────────────────────────────────────
+    async function boot(seed = null) {
+      endMessage.style.display = 'none';
+      setLoadProgress(10, 'REQUESTING 3D MATRIX...');
+
+      let mapData;
+      try {
+        const url = seed !== null
+          ? `/api/spatial-map?seed=${seed}`
+          : `/api/spatial-map`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        setLoadProgress(60, 'PARSING WORLD DATA...');
+        mapData = await res.json();
+        setLoadProgress(90, 'SPAWNING ENTITIES...');
+      } catch (err) {
+        setLoadProgress(0, `BACKEND OFFLINE — ${err.message}`);
+        setTimeout(() => boot(), 3000);
+        return;
+      }
+
+      // Teardown old engine if re-starting
+      if (engine) { engine.destroy(); engine = null; }
+
+      // Small delay for dramatic effect
+      await new Promise(r => setTimeout(r, 200));
+      setLoadProgress(100, 'READY');
+      await new Promise(r => setTimeout(r, 150));
+
+      // Fade out loading screen
+      loadScreen.classList.add('fade-out');
+      setTimeout(() => { loadScreen.style.display = 'none'; }, 400);
+
+      // Instantiate engine
+      engine = new SpatialEngine(canvas, mapData);
+
+      // Keep plane chip in sync
+      const updateChip = () => {
+        if (!engine) return;
+        const plane = engine.player.plane;
+        planeChip.textContent = plane === 'XY'
+          ? 'VIEW A — XY'
+          : 'VIEW B — ZY';
+        planeChip.className = plane === 'XY' ? 'xy' : 'zy';
+      };
+      // Poll plane changes every frame (cheap)
+      setInterval(updateChip, 50);
+
+      // Win / lose callbacks
+      engine.onWin(() => showEndScreen(true, null));
+      engine.onLose(() => showEndScreen(false, engine.winner));
+    }
+
+    function showEndScreen(won, killer) {
+      endHeading.textContent = won ? '** ESCAPED **' : '** CAUGHT **';
+      endHeading.className   = won ? 'won' : 'lost';
+      endSub.textContent     = won
+        ? 'You breached the reality boundary.'
+        : `Terminated by entity ${killer}.`;
+      endMessage.style.display = 'flex';
+    }
+
+    // ── Mobile touch controls ─────────────────────────────────────────────────
+    function dispatchKey(key, type = 'keydown') {
+      window.dispatchEvent(new KeyboardEvent(type, { key, bubbles: true }));
+    }
+
+    [
+      ['btnUp',    'ArrowUp'],
+      ['btnDown',  'ArrowDown'],
+      ['btnLeft',  'ArrowLeft'],
+      ['btnRight', 'ArrowRight'],
+    ].forEach(([id, key]) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('touchstart', e => { e.preventDefault(); dispatchKey(key, 'keydown'); }, { passive: false });
+      btn.addEventListener('touchend',   e => { e.preventDefault(); dispatchKey(key, 'keyup');   }, { passive: false });
+      btn.addEventListener('mousedown',  () => dispatchKey(key, 'keydown'));
+      btn.addEventListener('mouseup',    () => dispatchKey(key, 'keyup'));
+    });
+
+    // ── Global keybindings ────────────────────────────────────────────────────
+    window.addEventListener('keydown', e => {
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        if (engine) { engine.destroy(); engine = null; }
+        loadScreen.style.display = 'flex';
+        loadScreen.classList.remove('fade-out');
+        boot();
+      }
+      if (e.key === 'Escape') {
+        window.location.href = '/';
+      }
+    });
+
+    document.getElementById('btnRestart').addEventListener('click', () => {
+      if (engine) { engine.destroy(); engine = null; }
+      loadScreen.style.display = 'flex';
+      loadScreen.classList.remove('fade-out');
+      boot();
+    });
+    document.getElementById('btnMenu').addEventListener('click', () => {
+      window.location.href = '/';
+    });
+
+    // ── Start ─────────────────────────────────────────────────────────────────
+    boot();
+  </script>
+</body>
+</html>
