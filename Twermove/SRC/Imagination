@@ -1,0 +1,44 @@
+nguồn Cảm Hứng Cốt Truyện &amp; Tâm Lý (Narrative &amp; World-building) Disco Elysium: Tiêu chuẩn vàng cho hệ thống "độc thoại nội tâm". Trong tựa game này, các phần não bộ và kỹ năng của nhân vật liên tục tranh cãi, nói dối và thao túng lẫn nhau. Bạn có thể nghiên cứu cách họ viết hội thoại để áp dụng cho "Tiếng nói sinh tồn" (trắng) và "Tiếng nói thao túng" (đỏ) của nhân vật chính.
+
+SOMA: Một tựa game kinh dị tâm lý xuất sắc về khủng hoảng hiện sinh (existential dread). Nhân vật không biết mình là con người hay chỉ là một bản sao kỹ thuật số kẹt trong xác máy. Rất phù hợp để bạn tham khảo cách xây dựng bầu không khí rỉ sét, mục nát và sự tuyệt vọng vô hình.
+
+Yume Nikki / OMORI: Hai đại diện tiêu biểu cho phong cách khám phá một tâm trí đang sụp đổ (trauma-core). Hãy chú ý cách họ sử dụng những căn phòng phi logic, không gian lặp lại và những cái bóng vô hồn để kể chuyện mà không cần dùng quá nhiều lời thoại.
+
+NieR: Automata (Giao diện người dùng): Khi nhân vật android bị hỏng, toàn bộ UI (màn hình, bản đồ, âm thanh) cũng bị glitch và vỡ nát theo.
+
+Thuật Ngữ &amp; Kỹ Thuật Thiết Kế (Game Design Concepts) Hãy thêm các từ khóa này vào Sổ tay để định hướng thiết kế:
+
+Diegetic UI (Giao diện nội tại): Khái niệm thiết kế giao diện không nằm ngoài màn hình (như thanh máu góc trái) mà tồn tại ngay trong thế giới game. Ví dụ của bạn: dòng chữ nổi trên da, la bàn cắm vào mạch máu.
+
+Unreliable Narrator (Người kể chuyện không đáng tin): Thủ pháp văn học/game mà góc nhìn của nhân vật chính bị bóp méo bởi tổn thương tâm lý. Người chơi không bao giờ chắc chắn thứ họ nhìn thấy (quái vật, lối thoát) là thực tại hay ảo giác.
+
+Environmental Storytelling (Kể chuyện qua môi trường): Thay vì kể "nơi này từng là phòng thí nghiệm", bạn đặt những vệt máu kéo dài, một cái máy thở đã tắt nguồn, và những mảnh giấy ghi chú tuyệt vọng vứt vãi.
+
+Nền Tảng Kỹ Thuật Đề Xuất (Dành cho Web Game) Dựa trên quyết định giữ lại thế mạnh về DOM, HTML/CSS và text manipulation:
+
+Twine (Cấu trúc SugarCube): Đây là engine chuyên dụng để viết Interactive Fiction (truyện tương tác). Điểm mạnh của nó là cực kỳ dễ nhúng HTML/CSS/JavaScript để tạo ra các đoạn text bị glitch (sử dụng thư viện CSS glitch, Zalgo text) mà không phải code lại vòng lặp game phức tạp.
+
+Phaser.js: Nếu bạn vẫn muốn có nhân vật di chuyển trên một mặt phẳng 2D (chạy trốn xác máy, tránh các hố đen xâm thực) nhưng kết hợp với giao diện web tĩnh, Phaser xử lý hệ thống va chạm (collision) và camera rất tốt. Trước khi chính thức đặt bút viết Hồi 1, Sổ tay của chúng ta đã rất vững chắc về Không khí (Vibe), Cơ chế (Mechanics) và Mối đe dọa (Threats). Tuy nhiên, để cốt truyện không bị lan man và có tính định hướng, bạn nên bổ sung 3 mục "chốt chặn" cuối cùng này vào Sổ tay:
+
+1. Thiết Kế Âm Thanh (The Soundscape) Trong thể loại kinh dị tâm lý và trauma-core, âm thanh chiếm 50% trải nghiệm. Bạn cần định hình thế giới này nghe như thế nào:
+
+Âm nền (Ambient): Không có nhạc nền du dương. Thay vào đó là tiếng ù ù của quạt tản nhiệt rỉ sét, tiếng rè (white noise) chói tai mỗi khi Không Gian Xâm Thực (The Erasure) tiến lại gần, hoặc nhịp đập chậm chạp của một trái tim kim loại.
+
+Giọng nói (The Voices): Tiếng thì thầm của "Bóng đen quá khứ" chồng chéo lên nhau. Âm thanh cọ xát kim loại chói tai của lũ Xác Máy.
+
+Phản hồi UI: Tiếng tíc tíc khô khốc khi các dòng chữ đỏ/trắng hiện lên da thịt.
+
+1. Động Từ Của Người Chơi (Player Verbs) Trong game này, người chơi thực tế sẽ làm những hành động gì để tương tác với thế giới? (Điều này giúp định hình cách viết kịch bản):
+
+Di chuyển: Lết từng bước (WASD / Mũi tên).
+
+Nhắm mắt / Trốn tránh: Giữ một phím (ví dụ: Spacebar) để nhắm mắt lại, vô hiệu hóa các dòng chữ thao túng màu đỏ, nhưng bù lại màn hình tối đen và không thấy quái vật.
+
+Kiểm tra La bàn: Giơ cánh tay lên để xem tín hiệu (có thể làm chậm tốc độ di chuyển).
+
+1. Chủ Đề Cốt Lõi &amp; Đích Đến (The Theme &amp; The Inevitable End) Dù chúng ta chơi theo hướng mông lung, nhưng với tư cách là người thiết kế, bạn phải biết đích đến là gì.
+
+Chủ đề: Trò chơi này nói về sự buông bỏ (Letting go), nỗi đau của việc níu kéo ký ức (Holding on), hay sự trừng phạt bản thân (Guilt)?
+
+Mục tiêu cuối cùng: Người chơi đang đi về đâu? Đi tìm "Trạm Ký Ức Trung Tâm" để xóa sạch mọi thứ trước khi chết? Hay tìm lại hình bóng của một người cụ thể (một file dữ liệu không bị hỏng)?
+Trò chơi sẽ kết thúc khi nhân vật nhớ ra sự thật và tan biến, hay khi bị hệ thống nuốt chửng hoàn toàn?

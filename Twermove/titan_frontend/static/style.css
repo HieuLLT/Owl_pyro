@@ -1,0 +1,401 @@
+/*
+ * style.css — Twermove
+ * Aesthetic: Trauma-core / Glitch-core / Brutalist
+ * Scope: Main Menu only — game pages added per-module
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=VT323&family=Share+Tech+Mono&display=swap');
+
+/* ── Emotion fonts (local) ── */
+
+@font-face {
+  font-family: 'MTO Getting Angry';
+  src: url('fonts/MTOGettingAngry.ttf') format('truetype');
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hundred Watt';
+  src: url('fonts/HundredWatt.ttf') format('truetype');
+  font-weight: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'MTO Grunge Sans';
+  src: url('fonts/MTOGrungeSans.ttf') format('truetype');
+  font-weight: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'Skippy Sharpi';
+  src: url('fonts/SkippySharpi.ttf') format('truetype');
+  font-weight: normal; font-style: normal; font-display: swap;
+}
+
+@font-face {
+  font-family: 'KillCrazy';
+  src: url('fonts/KillCrazy.ttf') format('truetype');
+  font-weight: normal; font-display: swap;
+}
+
+/* ════════════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════════ */
+:root {
+  /* Void */
+  --void-black:   #030303;
+  --void-crimson: #120000;
+
+  /* Palette */
+  --bg:           #030303;
+  --bg2:          #0c0c0c;
+  --red:          #e82020;
+  --red-bright:   #ff3535;
+  --red-dim:      rgba(232, 32, 32, 0.12);
+  --red-glow:     rgba(232, 32, 32, 0.45);
+  --red-border:   rgba(232, 32, 32, 0.4);
+  --white:        #f0f0f0;
+  --white-dim:    rgba(240, 240, 240, 0.55);
+  --orange:       #ff6b00;
+
+  /* Chromatic aberration channels */
+  --chroma-red:   rgba(255, 0,   0,   0.8);
+  --chroma-cyan:  rgba(0,   255, 255, 0.8);
+
+  /* Typography */
+  --font:         'Space Mono', 'Courier New', monospace;
+  --font-angry:   'MTO Getting Angry', 'Space Mono', monospace;
+  --font-envy:    'Hundred Watt', serif;
+  --font-shame:   'MTO Grunge Sans', 'Space Mono', monospace;
+  --font-despair: 'Skippy Sharpi', cursive, system-ui;
+  --font-rage:    'KillCrazy', sans-serif;
+}
+
+/* ════════════════════════════════════════════════
+   GLOBAL RESET
+════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font);
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  /* Effect 1 — Breathing Void */
+  animation: void-breathe 8s ease-in-out infinite alternate;
+}
+
+@keyframes void-breathe {
+  from { background-color: var(--void-black); }
+  to   { background-color: var(--void-crimson); }
+}
+
+/* Scrollable pages need this override */
+body.scrollable { overflow-y: auto; }
+
+/* ════════════════════════════════════════════════
+   CRT SCANLINES (always on top)
+════════════════════════════════════════════════ */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.07) 2px,
+    rgba(0, 0, 0, 0.07) 4px
+  );
+}
+
+/* ════════════════════════════════════════════════
+   ATMOSPHERE LAYERS
+════════════════════════════════════════════════ */
+
+/* Claustrophobic vignette */
+.vignette {
+  position: fixed; inset: 0; z-index: 4; pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 75% at 50% 50%,
+    transparent 36%,
+    rgba(0, 0, 0, 0.5) 66%,
+    rgba(0, 0, 0, 0.94) 100%
+  );
+}
+
+/* SVG fractal noise overlay */
+.static-noise {
+  position: fixed; inset: 0; z-index: 5;
+  pointer-events: none; opacity: 0.055;
+  filter: url(#titan-static); background: #fff;
+}
+
+/* CRT scanline + RGB channel grid */
+.crt-scanlines {
+  position: fixed; inset: 0; z-index: 6; pointer-events: none;
+  background:
+    linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.18) 50%),
+    linear-gradient(90deg, rgba(232,32,32,0.04), rgba(0,255,0,0.01), rgba(0,0,255,0.03));
+  background-size: 100% 3px, 4px 100%;
+}
+
+/* Background vent phrases container */
+#chaos-container {
+  position: fixed; inset: 0; z-index: 10; pointer-events: none;
+}
+
+/* Individual vent text spans — positioned by atmosphere.js */
+.vent-phrase {
+  position: absolute; white-space: nowrap;
+  user-select: none; pointer-events: none;
+  font-family: var(--font); mix-blend-mode: screen; color: var(--red);
+}
+
+.vent-phrase.white-tint  { color: rgba(240,240,240,1);  mix-blend-mode: overlay; }
+.vent-phrase.envy-tint   { color: #1a6600;              mix-blend-mode: screen;  font-family: var(--font-envy); }
+.vent-phrase.rage-tint   { color: #ff4400;              mix-blend-mode: screen;  font-family: var(--font-rage); }
+.vent-phrase.despair-tint{ color: #0a1a6e;              mix-blend-mode: screen;  font-family: var(--font-despair); }
+.vent-phrase.shame-tint  { color: #3a0050;              mix-blend-mode: screen;  font-family: var(--font-shame); }
+.vent-phrase.system-tint { color: #003322;              mix-blend-mode: screen;  font-family: var(--font-angry); font-size: 0.55em; letter-spacing: 1px; }
+
+/* Flash monologue container */
+#flash-container {
+  position: fixed; inset: 0; z-index: 100; pointer-events: none;
+}
+
+.flash-phrase {
+  position: absolute;
+  font-family: var(--font); font-weight: 400;
+  color: var(--white); white-space: nowrap;
+  pointer-events: none; user-select: none; opacity: 0;
+  max-width: 88vw; overflow: hidden;
+  text-shadow: 0 0 12px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.95), 2px 2px 6px rgba(0,0,0,1);
+  transition: opacity 0.35s ease;
+}
+
+/* Emotion flash variants */
+.emotion-fragment { font-family: var(--font-angry); color: var(--red);   text-shadow: 0 0 24px var(--red-glow); letter-spacing: 4px; font-weight: 700; }
+.emotion-rage     { font-family: var(--font-rage);   color: #ff3300;      text-shadow: 0 0 22px rgba(255,51,0,0.85); }
+.emotion-envy     { font-family: var(--font-angry);  color: #00e84e;      text-shadow: 0 0 22px rgba(0,232,78,0.75); }
+.emotion-despair  { font-family: var(--font-despair);color: #4488ff;      text-shadow: 0 0 20px rgba(68,136,255,0.75); }
+.emotion-shame    { font-family: var(--font-shame);  color: #dd33ff;      text-shadow: 0 0 20px rgba(221,51,255,0.75); }
+.emotion-hatred   { font-family: var(--font-angry);  color: #ff1111;      text-shadow: 0 0 20px rgba(255,17,17,0.85); }
+
+/* Climax punch-in animation */
+@keyframes climax-punch {
+  0%   { opacity: 0; transform: scale(0.88); }
+  7%   { opacity: 1; transform: scale(1.07); }
+  16%  { transform: scale(0.97); }
+  25%  { transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1.00); }
+}
+
+.flash-phrase.climax-flash {
+  animation: climax-punch 0.22s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+  transition: none !important;
+}
+
+/* ════════════════════════════════════════════════
+   SYSTEM TEAR EFFECT
+════════════════════════════════════════════════ */
+.system-tear-slice {
+  position: fixed; top: 35%; height: 7%;
+  left: 0; right: 0; z-index: 9990;
+  pointer-events: none; opacity: 0;
+  background: transparent;
+  transform: translateX(0);
+  will-change: transform, opacity;
+  transition: none !important;
+}
+
+body.system-tear .system-tear-slice {
+  opacity: 1;
+  transform: translateX(-10px);
+  background: linear-gradient(
+    to bottom,
+    rgba(255,0,0,0.20) 0%,
+    rgba(0,255,255,0.14) 50%,
+    rgba(255,0,0,0.10) 100%
+  );
+  filter: blur(0.4px);
+}
+
+body.system-tear .metal-btn {
+  text-shadow:
+    1px 1px 4px #000,
+    0 0 12px rgba(232,32,32,0.4),
+    -8px 0 0 var(--chroma-red),
+    8px 0 0 var(--chroma-cyan);
+  transition: none;
+}
+
+body.system-tear .menu-actions {
+  transform: translateX(-8px) skewX(-0.4deg);
+  transition: none;
+}
+
+body.system-tear #chaos-container {
+  transform: translateX(-6px) skewX(0.5deg);
+  filter: saturate(1.5) brightness(1.12);
+  transition: none;
+}
+
+body.system-tear::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9988;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent          0px,
+    transparent          3px,
+    rgba(232,32,32,0.06) 3px,
+    rgba(232,32,32,0.06) 4px
+  );
+  pointer-events: none;
+}
+
+.integrity-dead {
+  background: rgba(255,255,255,0.8);
+  mix-blend-mode: screen;
+}
+
+/* ════════════════════════════════════════════════
+   MAIN MENU BUTTONS
+════════════════════════════════════════════════ */
+.menu-actions {
+  position: fixed;
+  bottom: 52px;
+  left: clamp(5vw, 8vw, 120px);
+  z-index: 200;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: btn-reveal 0.6s ease 4.8s forwards;
+}
+
+@keyframes btn-reveal { to { opacity: 1; } }
+
+.metal-btn {
+  position: relative;
+  background: linear-gradient(112deg, #2a0000 0%, #1a0000 25%, #3d0000 50%, #0d0000 72%, #1f0000 100%);
+  color: rgba(232,32,32,0.9);
+  font-family: var(--font);
+  font-size: 11px; font-weight: 700;
+  padding: 18px 38px;
+  text-transform: uppercase; letter-spacing: 5px;
+  text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; user-select: none;
+  clip-path: polygon(2% 0%, 96% 0%, 100% 4%, 98% 38%, 100% 44%, 97% 100%, 4% 100%, 0% 96%, 3% 48%, 0% 42%);
+  text-shadow:
+    1px 1px 4px #000,
+    0 0 12px rgba(232,32,32,0.4),
+    -2px 0 0 var(--chroma-red),
+    2px 0 0 var(--chroma-cyan);
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), inset -4px -4px 14px rgba(0,0,0,0.85);
+  transition: color 0.08s, text-shadow 0.08s, background 0.08s;
+}
+
+.metal-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(72deg, transparent, transparent 5px, rgba(255,255,255,0.03) 5px, rgba(255,255,255,0.03) 6px);
+  pointer-events: none;
+}
+
+.metal-btn::before {
+  content: ''; position: absolute; inset: 0; clip-path: inherit;
+  box-shadow: inset 0 0 0 1px rgba(232,32,32,0.28); pointer-events: none;
+}
+
+.metal-btn:hover {
+  background: linear-gradient(112deg, #3d0000 0%, #2a0000 25%, #550000 50%, #1a0000 72%, #330000 100%);
+  color: #fff;
+  text-shadow: 0 0 8px rgba(232,32,32,0.95), 1px 1px 4px #000;
+  transform: translate(-2px,-2px);
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.07), inset -4px -4px 14px rgba(0,0,0,0.85), 0 0 28px var(--red-glow), 0 0 55px var(--red-dim);
+}
+
+.metal-btn:active { transform: translate(2px,2px); box-shadow: none; }
+
+.metal-btn.secondary {
+  background: linear-gradient(112deg, #111 0%, #0a0a0a 30%, #1a1a1a 50%, #050505 72%, #0f0f0f 100%);
+  color: rgba(240,240,240,0.4);
+  clip-path: polygon(1% 0%, 97% 0%, 100% 3%, 99% 55%, 100% 60%, 98% 100%, 2% 100%, 0% 97%, 2% 40%, 0% 35%);
+}
+
+.metal-btn.secondary:hover {
+  background: linear-gradient(112deg, #222 0%, #181818 30%, #2a2a2a 50%, #111 72%, #1e1e1e 100%);
+  color: rgba(240,240,240,0.9);
+  text-shadow: 0 0 8px rgba(255,255,255,0.5), 1px 1px 4px #000;
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.07), 0 0 24px rgba(255,255,255,0.15);
+}
+
+.metal-btn.processing {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: not-allowed;
+  letter-spacing: 8px;
+}
+
+.metal-btn.error-state {
+  color: var(--red);
+  text-shadow: 0 0 14px rgba(232,32,32,0.9), -2px 0 0 var(--chroma-red), 2px 0 0 var(--chroma-cyan);
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════════ */
+.index-footer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  padding: 14px 28px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font); font-size: 8px; letter-spacing: 2.5px;
+  color: rgba(232,32,32,0.22);
+  border-top: 1px solid rgba(232,32,32,0.06);
+  z-index: 200;
+}
+
+/* ════════════════════════════════════════════════
+   TRANSITION VEIL (page nav fade)
+════════════════════════════════════════════════ */
+#transition-veil {
+  position: fixed; inset: 0; z-index: 999999;
+  background: #000;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.9s ease;
+}
+
+#transition-veil.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ════════════════════════════════════════════════
+   UTILITY
+════════════════════════════════════════════════ */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+}
+
+@keyframes blink { 50% { opacity: 0; } }
+.cursor::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+  color: var(--red);
+  margin-left: 2px;
+}
