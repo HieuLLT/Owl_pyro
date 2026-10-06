@@ -103,6 +103,9 @@ func _rebuild_firewall_display() -> void:
 # ─────────────────────────────────────────────
 
 func _on_leak_speak(msg: String, intensity: float) -> void:
+	# Nhắm Mắt cuts the manipulation voice completely (GDD, Định luật 4)
+	if _blind:
+		return
 	# Random screen position — avoiding the dead centre. Labels come from the pool.
 	var pos := Vector2(randf_range(40.0, 1200.0), randf_range(40.0, 650.0))
 	_pool.show_text(msg, VoiceTextPool.Voice.RED, pos, intensity)
@@ -157,8 +160,13 @@ func _chaos_shake_tick() -> void:
 # BLINK OVERLAY
 # ─────────────────────────────────────────────
 
+var _blind: bool = false
+
 func _on_blink(is_blind: bool) -> void:
-	# When blind: FIREWALL dims, MEMORY LEAK becomes more prominent
+	_blind = is_blind
+	if is_blind:
+		_pool.clear_red()
+	# When blind: FIREWALL dims; the Red voice is silenced (see _on_leak_speak)
 	var fw_target_alpha: float = 0.3 if is_blind else 1.0
 	var tween := create_tween()
 	tween.tween_property(firewall_log, "modulate:a", fw_target_alpha, 0.4)

@@ -1,3 +1,7 @@
+> **Trạng thái dự án (10/2026):** engine chính của game là **Godot 4** trong thư mục [`PheТichYThuc/`](PheТichYThuc/README.md) ("Phế Tích Ý Thức").
+> `titan_frontend/` + `titan_backend/` chỉ còn là menu web và bản demo hệ thống thoại (`play.html`).
+> Phần "Spatial Cross-Section Engine" bên dưới là prototype cũ, không còn phát triển.
+
 # TERMINAL ATTRITION — Spatial Cross-Section Engine
 
 > **A real-time 2.5D survival game where rotating your view plane transforms walls into corridors — and brings hidden enemies out of nowhere.**

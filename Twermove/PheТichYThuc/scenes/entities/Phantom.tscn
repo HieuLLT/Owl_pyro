@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/Phantom.gd" id="1_phantom"]
+[ext_resource type="Shader" path="res://shaders/phantom_dissolve.gdshader" id="2_dissolve"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_range"]
+radius = 90.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_phantom"]
+shader = ExtResource("2_dissolve")
+
+[node name="Phantom" type="Area2D"]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_phantom")
+
+[node name="RangeShape" type="CollisionShape2D" parent="."]
+position = Vector2(0, -28)
+shape = SubResource("CircleShape2D_range")
+
+; Figure drawn as one ColorRect so a single shader dissolves all of it
+[node name="Body" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_phantom")
+offset_left = -14.0
+offset_top = -60.0
+offset_right = 14.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.36, 0.38, 0.42, 1.0)

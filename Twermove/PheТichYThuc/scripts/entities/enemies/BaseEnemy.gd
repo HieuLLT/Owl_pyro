@@ -67,6 +67,7 @@ func _physics_process(delta: float) -> void:
 	_run_state(delta)
 	_check_detection()
 	move_and_slide()
+	_contact_damage(delta)
 	_debug_label()
 
 # ─────────────────────────────────────────────
@@ -145,6 +146,17 @@ func _check_detection() -> void:
 		_escalate_state()
 	else:
 		_de_escalate_state()
+
+## Necrosis per second while a hunting enemy touches мрак.
+const CONTACT_NECROSIS_PER_SEC: float = 6.0
+const CONTACT_RANGE: float = 22.0
+
+func _contact_damage(delta: float) -> void:
+	if current_state != State.HUNT and current_state != State.FRENZY:
+		return
+	var mrak := _get_mrak()
+	if mrak and global_position.distance_to(mrak.global_position) <= CONTACT_RANGE:
+		GameManager.add_necrosis(CONTACT_NECROSIS_PER_SEC * delta)
 
 func _has_line_of_sight(target: Node2D) -> bool:
 	var space := get_world_2d().direct_space_state

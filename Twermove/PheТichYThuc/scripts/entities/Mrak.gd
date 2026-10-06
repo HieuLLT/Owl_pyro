@@ -19,6 +19,8 @@ const GRAVITY: float            = 980.0
 const SOUND_RADIUS_NORMAL: float   = 190.0
 const SOUND_RADIUS_CROUCHED: float = 75.0
 const SOUND_RADIUS_STILL: float    = 30.0
+## Eyes closed: footsteps nearly silent (GDD: footstepVolume 0.1)
+const SOUND_RADIUS_BLIND: float = 45.0
 
 ## Heat generated per second of movement
 const MOVE_HEAT_RATE: float = 1.5
@@ -44,6 +46,9 @@ var placeholder_sprite: ColorRect    = null   # placeholder until art ready
 # ─────────────────────────────────────────────
 # STATE
 # ─────────────────────────────────────────────
+
+## External slowdown (Phantom proximity etc). 1.0 = normal, 0.0 = rooted.
+var speed_multiplier: float = 1.0
 
 var is_crouched: bool = false
 var is_blind: bool    = false
@@ -120,7 +125,7 @@ func _handle_movement(delta: float) -> void:
 		is_moving = vert != 0.0
 	else:
 		var speed: float = CRAWL_SPEED_CROUCHED if is_crouched else CRAWL_SPEED
-		velocity.x = dir * speed
+		velocity.x = dir * speed * speed_multiplier
 		is_moving = dir != 0.0
 
 	# Sprite direction (sprite is null while the ColorRect placeholder is used)
@@ -186,7 +191,7 @@ func _on_blink_changed(blind: bool) -> void:
 var _body_material: ShaderMaterial = null
 
 func _find_body_material() -> ShaderMaterial:
-	var target: CanvasItem = placeholder_sprite if placeholder_sprite else sprite
+	var target: CanvasItem = sprite if sprite else placeholder_sprite
 	if target and target.material is ShaderMaterial:
 		return target.material as ShaderMaterial
 	return null
@@ -239,7 +244,9 @@ func _update_heat(delta: float) -> void:
 
 func _update_sound_radius() -> void:
 	var radius: float
-	if not is_moving:
+	if is_blind:
+		radius = SOUND_RADIUS_BLIND
+	elif not is_moving:
 		radius = SOUND_RADIUS_STILL
 	elif is_crouched:
 		radius = SOUND_RADIUS_CROUCHED

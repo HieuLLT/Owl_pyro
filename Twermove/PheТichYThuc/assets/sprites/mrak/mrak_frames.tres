@@ -1,0 +1,95 @@
+[gd_resource type="SpriteFrames" load_steps=16 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/idle_0.png" id="1_idle0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/idle_1.png" id="2_idle1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_0.png" id="3_crawl0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_1.png" id="4_crawl1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_2.png" id="5_crawl2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_3.png" id="6_crawl3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crouch_idle_0.png" id="7_crouch_idle0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_low_0.png" id="8_crawl_low0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_low_1.png" id="9_crawl_low1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_low_2.png" id="10_crawl_low2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/crawl_low_3.png" id="11_crawl_low3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/fall_0.png" id="12_fall0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/fall_1.png" id="13_fall1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/climb_0.png" id="14_climb0"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mrak/climb_1.png" id="15_climb1"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_idle0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_idle1")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_crawl0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_crawl1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_crawl2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_crawl3")
+}],
+"loop": true,
+"name": &"crawl",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_crouch_idle0")
+}],
+"loop": true,
+"name": &"crouch_idle",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_crawl_low0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_crawl_low1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_crawl_low2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_crawl_low3")
+}],
+"loop": true,
+"name": &"crawl_low",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_fall0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_fall1")
+}],
+"loop": true,
+"name": &"fall",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_climb0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_climb1")
+}],
+"loop": true,
+"name": &"climb",
+"speed": 6.0
+}]

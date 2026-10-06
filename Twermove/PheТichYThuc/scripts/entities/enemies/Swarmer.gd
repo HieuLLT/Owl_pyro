@@ -41,6 +41,8 @@ func _on_pack_alarm(alarm_pos: Vector2) -> void:
 			_set_state(State.HUNT)
 
 func _on_state_entered(state: State) -> void:
+	if not sprite:
+		return
 	match state:
 		State.IDLE:       sprite.play("idle")
 		State.PATROL:     sprite.play("swarm_patrol")

@@ -14,6 +14,7 @@ func _ready() -> void:
 	super._ready()
 
 func _on_state_entered(state: State) -> void:
+	_set_alert_visual(state)
 	if not sprite:
 		return
 	match state:
@@ -21,3 +22,15 @@ func _on_state_entered(state: State) -> void:
 		State.PATROL:     sprite.play("crawl")
 		State.SUSPICIOUS: sprite.play("alert")
 		State.HUNT, State.FRENZY: sprite.play("chase")
+
+## Drives scavenger_glitch.gdshader: 0 dormant ... 1 hunting.
+func _set_alert_visual(state: State) -> void:
+	var target: CanvasItem = sprite if sprite else get_node_or_null("PlaceholderSprite")
+	if target == null or not (target.material is ShaderMaterial):
+		return
+	var value: float = 0.0
+	match state:
+		State.SUSPICIOUS: value = 0.35
+		State.HUNT:       value = 0.8
+		State.FRENZY:     value = 1.0
+	(target.material as ShaderMaterial).set_shader_parameter("alert", value)

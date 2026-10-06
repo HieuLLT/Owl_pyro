@@ -31,6 +31,8 @@ buses/default_bus_layout="uid://busphetich001"
 EventBus="*res://scripts/core/EventBus.gd"
 GameManager="*res://scripts/core/GameManager.gd"
 SaveSystem="*res://scripts/core/SaveSystem.gd"
+MemorySystem="*res://scripts/systems/MemorySystem.gd"
+DialogueSystem="*res://scripts/systems/DialogueSystem.gd"
 
 [display]
 

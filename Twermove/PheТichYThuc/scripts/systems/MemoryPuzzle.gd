@@ -87,8 +87,9 @@ func _input(event: InputEvent) -> void:
 
 func start_puzzle(shard_id: String) -> void:
 	current_shard_id = shard_id
-	var data := MemorySystem.get_shard_data(shard_id) if Engine.has_singleton("MemorySystem") else {}
-	current_config = MemorySystem.get_puzzle_config(shard_id) if Engine.has_singleton("MemorySystem") else {}
+	# MemorySystem is an autoload (see project.godot), so it is a plain global.
+	var data: Dictionary = MemorySystem.get_shard_data(shard_id)
+	current_config = MemorySystem.get_puzzle_config(shard_id)
 
 	var type_str: String = data.get("type", "SIGNAL_TUNING")
 	match type_str:

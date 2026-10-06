@@ -3,9 +3,12 @@
 [ext_resource type="Script" path="res://scripts/entities/Mrak.gd" id="1_mrak"]
 [ext_resource type="Script" path="res://scripts/entities/MrakBody.gd" id="2_mrakbody"]
 [ext_resource type="Shader" path="res://shaders/mrak_glitch_body.gdshader" id="3_glitchbody"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/mrak/mrak_frames.tres" id="4_frames"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]
 shader = ExtResource("3_glitchbody")
+shader_parameter/head_height = 0.36
+shader_parameter/heart_pos = Vector2(0.5, 0.58)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_stand"]
 radius = 8.0
@@ -29,32 +32,14 @@ collision_layer = 4
 collision_mask = 3
 script = ExtResource("1_mrak")
 
-; ── Placeholder visual until Aseprite art is ready ──
-[node name="PlaceholderSprite" type="ColorRect" parent="."]
+; ── Procedural pixel-art body (tools/gen_mrak_sprite.py) ──
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 material = SubResource("ShaderMaterial_body")
-offset_left = -9.0
-offset_top = -48.0
-offset_right = 9.0
-offset_bottom = 0.0
-color = Color(0.0, 1.0, 0.8, 1.0)
-
-; Chest detail (battery indicator tint)
-[node name="ChestGlow" type="ColorRect" parent="PlaceholderSprite"]
-use_parent_material = true
-offset_left = 2.0
-offset_top = 12.0
-offset_right = 14.0
-offset_bottom = 22.0
-color = Color(0.0, 0.9, 0.6, 0.8)
-
-; Heat core dot
-[node name="CoreDot" type="ColorRect" parent="PlaceholderSprite"]
-use_parent_material = true
-offset_left = 5.0
-offset_top = 18.0
-offset_right = 11.0
-offset_bottom = 24.0
-color = Color(0.0, 1.0, 0.8, 1.0)
+texture_filter = 1
+position = Vector2(0, -32)
+sprite_frames = ExtResource("4_frames")
+animation = &"idle"
+autoplay = "idle"
 
 ; ── Standing collision ──
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

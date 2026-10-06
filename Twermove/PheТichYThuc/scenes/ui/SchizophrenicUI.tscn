@@ -4,12 +4,16 @@
 
 [ext_resource type="Shader" path="res://shaders/vignette_dynamic.gdshader" id="2_vignette"]
 [ext_resource type="Shader" path="res://shaders/glitch_displacement.gdshader" id="3_glitch"]
+[ext_resource type="Shader" path="res://shaders/crt_scanline.gdshader" id="4_crt"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
 shader = ExtResource("2_vignette")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_glitch"]
 shader = ExtResource("3_glitch")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_crt"]
+shader = ExtResource("4_crt")
 
 [node name="SchizophrenicUI" type="CanvasLayer"]
 layer = 10
@@ -50,6 +54,7 @@ mouse_filter = 2
 
 ; ── CRT scanline overlay ──
 [node name="CRTOverlay" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_crt")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
