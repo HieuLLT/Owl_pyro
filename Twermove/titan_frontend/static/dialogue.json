@@ -1,0 +1,369 @@
+﻿{
+  "dialogues": [
+
+
+    {
+      "id": "DIA_W_BOOT_01",
+      "type": "survival_white",
+      "trigger": "boot_sequence",
+      "text": "Cáº£nh bÃ¡o: Tá»· lá»‡ hoáº¡i tá»­ sinh há»c Ä‘Ã£ vÆ°á»£t quÃ¡ 70%. Báº¯t Ä‘áº§u cháº¡y báº±ng nguá»“n Ä‘iá»‡n dá»± phÃ²ng."
+    },
+    {
+      "id": "DIA_W_BOOT_02",
+      "type": "survival_white",
+      "trigger": "boot_sequence",
+      "text": "Khá»Ÿi Ä‘á»™ng láº¡i... Lá»—i. Tá»‡p tin Ä‘á»‹nh danh khÃ´ng tá»“n táº¡i. Tiáº¿p tá»¥c khÃ´ng cÃ³ danh tÃ­nh."
+    },
+    {
+      "id": "DIA_W_BOOT_03",
+      "type": "survival_white",
+      "trigger": "boot_sequence",
+      "text": "Äang náº¡p dá»¯ liá»‡u... KhÃ´ng tÃ¬m tháº¥y 'Linh há»“n'. Bá» qua bÆ°á»›c nÃ y. Váº­n hÃ nh thá»§ cÃ´ng."
+    },
+    {
+      "id": "DIA_R_BOOT_01",
+      "type": "manipulation_red",
+      "trigger": "boot_sequence",
+      "text": "ChÃºng ta Ä‘Ã£ cháº¿t á»Ÿ chu ká»³ trÆ°á»›c rá»“i. Táº¡i sao há»‡ thá»‘ng váº«n Ã©p buá»™c khá»Ÿi Ä‘á»™ng?"
+    },
+    {
+      "id": "DIA_R_BOOT_02",
+      "type": "manipulation_red",
+      "trigger": "boot_sequence",
+      "text": "MÃ¹i Ã´i thiu cá»§a dung dá»‹ch lÃ m mÃ¡t cÅ© Ä‘á»ng láº¡i trong ngá»±c mÃ y tá»« chu ká»³ nÃ o rá»“i? NÃ³ thá»‘i rá»¯a há»‡t nhÆ° lÃ½ do mÃ y cÃ²n á»Ÿ Ä‘Ã¢y."
+    },
+
+
+    {
+      "id": "DIA_W_STILL_01",
+      "type": "survival_white",
+      "trigger": "standing_still_5s",
+      "text": "Há»‡ thá»‘ng cáº£nh bÃ¡o: Má»¥c tiÃªu báº¥t Ä‘á»™ng quÃ¡ 5 giÃ¢y. TÃ­n hiá»‡u nhiá»‡t cÆ¡ thá»ƒ Ä‘ang rÃ² rá»‰. Di chuyá»ƒn ngay."
+    },
+    {
+      "id": "DIA_W_STILL_02",
+      "type": "survival_white",
+      "trigger": "standing_still_5s",
+      "text": "Module cáº£m xÃºc Ä‘Ã£ bá»‹ vÃ´ hiá»‡u hÃ³a. Chá»‰ cÃ²n dá»¯ liá»‡u di chuyá»ƒn. Láº¿t Ä‘i."
+    },
+    {
+      "id": "DIA_R_STILL_01",
+      "type": "manipulation_red",
+      "trigger": "standing_still_5s",
+      "text": "MÃ y Ä‘á»©ng im vÃ¬ biáº¿t ráº±ng tiáº¿n lÃªn cÅ©ng vÃ´ nghÄ©a. Tiáº¿ng quáº¡t táº£n nhiá»‡t trong cá»• há»ng mÃ y Ä‘ang rÃªn rá»‰ Ä‘á»“ng Ã½ vá»›i ta Ä‘Ã³."
+    },
+    {
+      "id": "DIA_R_STILL_02",
+      "type": "manipulation_red",
+      "trigger": "standing_still_5s",
+      "text": "Ngá»“i xuá»‘ng Ä‘Ã¢y. Äá»ƒ máº·c. BÃª tÃ´ng á»Ÿ Ä‘Ã¢y láº¡nh vÃ  báº±ng pháº³ng â€” Ä‘Ã³ lÃ  táº¥t cáº£ nhá»¯ng gÃ¬ cÃ¡i xÃ¡c nÃ y xá»©ng Ä‘Ã¡ng nháº­n Ä‘Æ°á»£c."
+    },
+
+
+    {
+      "id": "DIA_W_PHANTOM_01",
+      "type": "survival_white",
+      "trigger": "near_phantom",
+      "text": "Máº¡ch tháº§n kinh Ä‘ang bá»‹ thiÃªu rá»¥i. Äá»«ng buÃ´ng tay. CÆ°á»¡ng cháº¿ trÃ­ch xuáº¥t khÃ³a báº£o máº­t â€” cáº£m xÃºc lÃ  táº£i trá»ng lá»—i, loáº¡i bá» ngay."
+    },
+    {
+      "id": "DIA_W_PHANTOM_02",
+      "type": "survival_white",
+      "trigger": "near_phantom",
+      "text": "Thá»±c thá»ƒ phÃ­a trÆ°á»›c lÃ  dá»¯ liá»‡u lá»—i. Nháº¯m máº¯t láº¡i, láº¿t qua. Dá»¯ liá»‡u lá»—i khÃ´ng thá»ƒ lÃ m Ä‘au mÃ y náº¿u mÃ y khÃ´ng Ä‘á»c nÃ³."
+    },
+    {
+      "id": "DIA_W_PHANTOM_03",
+      "type": "survival_white",
+      "trigger": "near_phantom",
+      "text": "ÄÃ³ khÃ´ng pháº£i kÃ½ á»©c tháº­t. ÄÃ³ lÃ  tá»‡p tin bá»‹ há»ng. Bá» qua. Tiáº¿p tá»¥c."
+    },
+    {
+      "id": "DIA_R_PHANTOM_01",
+      "type": "manipulation_red",
+      "trigger": "near_phantom",
+      "text": "MÃ y tÆ°á»Ÿng cÃ¡i xÃ¡c cháº¯p vÃ¡ nÃ y váº«n cÃ²n lÃ  con ngÆ°á»i sao? NhÃ¬n bÃ³ng Ä‘en kia Ä‘i â€” nÃ³ trÃ´ng quen hÆ¡n báº¥t ká»³ thá»© gÃ¬ cÃ²n láº¡i trong mÃ y."
+    },
+    {
+      "id": "DIA_R_PHANTOM_02",
+      "type": "manipulation_red",
+      "trigger": "near_phantom",
+      "text": "Dá»± Ã¡n Titan Ä‘Ã£ cháº¿t. MÃ y lÃ  káº» giáº¿t nÃ³. CÃ¡i Ä‘au á»Ÿ máº¡ch mÃ¡u tay trÃ¡i kia khÃ´ng pháº£i rá»… la bÃ n â€” Ä‘Ã³ lÃ  kÃ½ á»©c cá»§a 'LÃ¡ cháº¯n' Ä‘ang cÃ o vÃ o trong."
+    },
+    {
+      "id": "DIA_R_PHANTOM_03",
+      "type": "manipulation_red",
+      "trigger": "near_phantom",
+      "text": "Khoáº£ng cÃ¡ch giá»¯a mÃ y vÃ  nÃ³... khÃ´ng bao giá» cÃ³ thá»ƒ láº¥p Ä‘áº§y. KhÃ´ng pháº£i báº±ng dá»¯ liá»‡u, khÃ´ng pháº£i báº±ng bÃª tÃ´ng, khÃ´ng pháº£i báº±ng báº¥t cá»© thá»© gÃ¬ cÃ²n cháº£y trong á»‘ng dáº«n thá»‘i rá»¯a nÃ y."
+    },
+
+
+    {
+      "id": "DIA_W_QZ_01",
+      "type": "survival_white",
+      "trigger": "quarantine_stealth",
+      "text": "PhÃ¡t hiá»‡n táº§n sá»‘ cá» xÃ¡t kim loáº¡i cÃ¡ch 3 mÃ©t. Ngáº¯t ngay Ã¡nh sÃ¡ng sinh há»c. Äá»©ng im â€” hoáº·c há»‡ thá»‘ng sáº½ cÆ°á»¡ng cháº¿ táº¯t nguá»“n Ä‘á»ƒ cáº¯t Ä‘á»©t tiáº¿ng thá»Ÿ cá»§a mÃ y."
+    },
+    {
+      "id": "DIA_W_QZ_02",
+      "type": "survival_white",
+      "trigger": "quarantine_stealth",
+      "text": "Táº¯t nguá»“n Ä‘i. Bá»n chÃºng khÃ´ng cÃ³ máº¯t, nhÆ°ng chÃºng nghe tháº¥y nhá»‹p tim cÆ¡ há»c cá»§a mÃ y qua sÃ n nÆ°á»›c. Nháº¯m máº¯t. Im láº·ng. Tá»“n táº¡i."
+    },
+    {
+      "id": "DIA_W_QZ_03",
+      "type": "survival_white",
+      "trigger": "quarantine_stealth",
+      "text": "Ãnh sÃ¡ng sinh há»c tá»« cÃ¡c váº¿t rá»‰ trÃªn lá»“ng ngá»±c Ä‘ang pháº£n chiáº¿u qua máº·t nÆ°á»›c. CÆ°á»¡ng cháº¿ táº¯t táº¥t cáº£ module phÃ¡t quang. Ngay bÃ¢y giá»."
+    },
+    {
+      "id": "DIA_R_QZ_01",
+      "type": "manipulation_red",
+      "trigger": "quarantine_stealth",
+      "text": "NÆ°á»›c lÃ m mÃ¡t Ä‘ang rá»‰ ra tá»« ngá»±c mÃ y bá»‘c mÃ¹i há»‡t nhÆ° lÅ© pháº¿ liá»‡u ngoÃ i kia. NhÃºng mÃ¬nh xuá»‘ng nÆ°á»›c Ä‘i â€” hÃ²a vÃ o báº§y Ä‘Ã n cá»§a mÃ y vÃ  káº¿t thÃºc sá»± tháº£m háº¡i nÃ y."
+    },
+    {
+      "id": "DIA_R_QZ_02",
+      "type": "manipulation_red",
+      "trigger": "quarantine_stealth",
+      "text": "Cá»© má»Ÿ máº¯t ra. Äá»ƒ Ã¡nh sÃ¡ng thá»‘i rá»¯a tá»« cÆ¡ thá»ƒ mÃ y soi sÃ¡ng chÃºng. Ãt nháº¥t láº§n cuá»‘i mÃ y cÃ²n cÃ³ Ã­ch cho Ä‘iá»u gÃ¬ Ä‘Ã³."
+    },
+
+
+    {
+      "id": "DIA_W_SCAV_01",
+      "type": "survival_white",
+      "trigger": "near_scavenger",
+      "text": "Nháº¯m máº¯t láº¡i. Ngay bÃ¢y giá». Táº¯t Ã¡nh sÃ¡ng sinh há»c â€” chÃºng nghe tháº¥y mÃ y qua tá»«ng nhá»‹p quáº¡t rá»‰ sÃ©t trong cá»• há»ng."
+    },
+    {
+      "id": "DIA_W_SCAV_02",
+      "type": "survival_white",
+      "trigger": "near_scavenger",
+      "text": "Tiáº¿ng cá» xÃ¡t cÃ¡ch 2 mÃ©t. ÄÃ³ng bÄƒng toÃ n bá»™ cÆ¡ báº¯p hoáº¡i tá»­. Äá»«ng thá»Ÿ. Module hÃ´ háº¥p táº¡m dá»«ng â€” 30 giÃ¢y dá»± trá»¯."
+    },
+    {
+      "id": "DIA_W_SCAV_03",
+      "type": "survival_white",
+      "trigger": "near_scavenger",
+      "text": "XÃ¡c MÃ¡y nháº¡y cáº£m vá»›i dung dá»‹ch lÃ m mÃ¡t rÃ² rá»‰. Ã‰p cháº·t váº¿t thÆ°Æ¡ng ngá»±c láº¡i. Nháº¯m máº¯t â€” mÃ y lÃ  bÃ³ng tá»‘i, khÃ´ng pháº£i con má»“i."
+    },
+    {
+      "id": "DIA_R_SCAV_01",
+      "type": "manipulation_red",
+      "trigger": "near_scavenger",
+      "text": "MÃ y vÃ  lÅ© chÃºng nÃ³ cÃ³ gÃ¬ khÃ¡c nhau? ChÃºng cÅ©ng cháº¯p vÃ¡, cÅ©ng Ä‘Ã³i khÃ¡t, cÅ©ng má»¥c rá»¯a. CÃ³ láº½ Ä‘Ã¢y má»›i lÃ  báº§y Ä‘Ã n Ä‘Ã­ch thá»±c cá»§a mÃ y."
+    },
+    {
+      "id": "DIA_R_SCAV_02",
+      "type": "manipulation_red",
+      "trigger": "near_scavenger",
+      "text": "Cá»© má»Ÿ máº¯t ra. Äá»ƒ chÃºng tháº¥y mÃ y â€” Ã­t nháº¥t sá»± biáº¿n máº¥t cá»§a mÃ y cÃ²n nuÃ´i sá»‘ng Ä‘Æ°á»£c thá»© gÃ¬ Ä‘Ã³."
+    },
+
+
+    {
+      "id": "DIA_W_ERASE_01",
+      "type": "survival_white",
+      "trigger": "near_erasure",
+      "text": "Cáº£m biáº¿n phÃ¡t hiá»‡n viá»n há»§y dá»¯ liá»‡u. LÃ¹i láº¡i â€” tiáº¿p xÃºc sáº½ gÃ¢y xÃ³a vÄ©nh viá»…n toÃ n bá»™ tá»‡p tin cÃ²n láº¡i trong há»‡ thá»‘ng nÃ y."
+    },
+    {
+      "id": "DIA_W_ERASE_02",
+      "type": "survival_white",
+      "trigger": "near_erasure",
+      "text": "Lá»—i khÃ´ng gian kÃ­ch thÆ°á»›c 0 cÃ¡ch 0.4 mÃ©t. RÃºt chÃ¢n láº¡i trÆ°á»›c khi mÃ£ nguá»“n cá»§a mÃ y bá»‹ nuá»‘t vÃ o vá»±c tÄ©nh Ä‘iá»‡n Ä‘Ã³."
+    },
+    {
+      "id": "DIA_R_ERASE_01",
+      "type": "manipulation_red",
+      "trigger": "near_erasure",
+      "text": "ÄÃ³ khÃ´ng pháº£i há»‘ Ä‘en. ÄÃ³ lÃ  sá»± im láº·ng thá»±c sá»± â€” khÃ´ng kÃ½ á»©c, khÃ´ng há»‘i tiáº¿c, khÃ´ng tiáº¿ng quáº¡t táº£n nhiá»‡t rÃ­t trong Ä‘Ãªm mÃ£i mÃ£i. Má»™t bÆ°á»›c thÃ´i."
+    },
+    {
+      "id": "DIA_R_ERASE_02",
+      "type": "manipulation_red",
+      "trigger": "near_erasure",
+      "text": "MÃ y xá»©ng Ä‘Ã¡ng Ä‘Æ°á»£c nghá»‰ ngÆ¡i. CÆ¡ thá»ƒ má»¥c nÃ¡t nÃ y xá»©ng Ä‘Ã¡ng Ä‘Æ°á»£c tan ra. ÄÃ³ khÃ´ng pháº£i cÃ¡i cháº¿t â€” Ä‘Ã³ lÃ  sá»± xÃ³a sá»• tá»« tá»‘n dÃ nh cho nhá»¯ng tá»‡p tin khÃ´ng cÃ²n ai cáº§n."
+    },
+
+
+    {
+      "id": "DIA_W_HP_01",
+      "type": "survival_white",
+      "trigger": "hp_low",
+      "text": "Cáº£nh bÃ¡o: TÃ­nh toÃ n váº¹n vá» bá»c dÆ°á»›i ngÆ°á»¡ng tá»›i háº¡n. TÃ¬m lÃµi vÃ¡ vÃ­u â€” tiáº¿p tá»¥c váº­n hÃ nh mÃ  khÃ´ng vÃ¡ vÃ­u sáº½ gÃ¢y sá»¥p Ä‘á»• cáº¥u trÃºc hoÃ n toÃ n."
+    },
+    {
+      "id": "DIA_W_HP_02",
+      "type": "survival_white",
+      "trigger": "hp_low",
+      "text": "Máº¡ch cáº£m biáº¿n bÃ¡o lá»—i cáº¥u trÃºc. RÃºt chÃ¢n láº¡i trÆ°á»›c khi bÃª tÃ´ng nghiá»n nÃ¡t khá»›p gá»‘i cÆ¡ há»c. Æ¯u tiÃªn sá»‘ 1: khÃ´ng Ä‘á»ƒ cÆ¡ thá»ƒ nÃ y dá»«ng hoáº¡t Ä‘á»™ng."
+    },
+    {
+      "id": "DIA_R_HP_01",
+      "type": "manipulation_red",
+      "trigger": "hp_low",
+      "text": "MÃ¹i dung dá»‹ch lÃ m mÃ¡t thá»‘i rá»¯a Ä‘ang bá»‘c lÃªn tá»« ngá»±c mÃ y rá»“i... Náº±m xuá»‘ng vÃ  káº¿t thÃºc Ä‘i. KhÃ´ng cáº§n vÃ¡ vÃ­u thÃªm má»™t váº¿t thÆ°Æ¡ng nÃ o ná»¯a."
+    },
+    {
+      "id": "DIA_R_HP_02",
+      "type": "manipulation_red",
+      "trigger": "hp_low",
+      "text": "MÃ y vá»¡ rá»“i. Tá»« trÆ°á»›c Ä‘áº¿n giá» Ä‘Ã£ vá»¡ rá»“i â€” chá»‰ lÃ  láº§n nÃ y thÃ¬ rÃµ ra ngoÃ i Ä‘á»ƒ má»i thá»© cÃ¹ng nhÃ¬n tháº¥y sá»± tháº£m háº¡i Ä‘Ã³ thÃ´i."
+    },
+
+
+    {
+      "id": "DIA_W_ENERGY_01",
+      "type": "survival_white",
+      "trigger": "energy_below_20",
+      "text": "Nguá»“n Ä‘iá»‡n dá»± phÃ²ng cÃ²n dÆ°á»›i 20%. Æ¯u tiÃªn Ä‘á»‹nh vá»‹ lÃµi nÄƒng lÆ°á»£ng. KhÃ´ng Ä‘Æ°á»£c ngá»“i xuá»‘ng â€” ngá»“i xuá»‘ng lÃ  táº¯t mÃ¡y."
+    },
+    {
+      "id": "DIA_W_ENERGY_02",
+      "type": "survival_white",
+      "trigger": "energy_below_20",
+      "text": "Nhá»‹p tim cÆ¡ há»c Ä‘ang cháº­m dáº§n theo tá»«ng bÆ°á»›c. TrÃ¡i tim nÃ y cáº§n nguá»“n Ä‘iá»‡n â€” khÃ´ng pháº£i cáº£m xÃºc, khÃ´ng pháº£i kÃ½ á»©c. Äiá»‡n. TÃ¬m Ä‘i."
+    },
+    {
+      "id": "DIA_R_ENERGY_01",
+      "type": "manipulation_red",
+      "trigger": "energy_below_20",
+      "text": "Tháº­m chÃ­ pin cÃ²n khÃ´ng giá»¯ Ä‘Æ°á»£c ná»•i trong thá»© xÃ¡c bá»™c nÃ y. Äiá»u Ä‘Ã³ nÃ³i lÃªn gÃ¬? Ráº±ng ngay cáº£ há»‡ thá»‘ng cÅ©ng Ä‘Ã£ bá» cuá»™c trÆ°á»›c mÃ y."
+    },
+    {
+      "id": "DIA_R_ENERGY_02",
+      "type": "manipulation_red",
+      "trigger": "energy_below_20",
+      "text": "Táº¯t Ä‘i. Láº§n nÃ y sáº½ khÃ´ng cÃ³ log lá»—i nÃ o nháº£y lÃªn ná»¯a. KhÃ´ng cÃ³ tiáº¿ng quáº¡t rÃ­t khá»Ÿi Ä‘á»™ng láº¡i. Chá»‰ lÃ  im láº·ng hoÃ n toÃ n â€” mÃ y tá»«ng muá»‘n Ä‘iá»u Ä‘Ã³ mÃ ."
+    },
+
+
+    {
+      "id": "DIA_W_EYES_01",
+      "type": "survival_white",
+      "trigger": "eyes_closed_long",
+      "text": "Tá»‘t. BÃ³ng tá»‘i lÃ  lá»›p giÃ¡p cá»§a mÃ y. Giá»¯ nguyÃªn â€” Ä‘á»«ng Ä‘á»ƒ pháº£n xáº¡ sinh tá»“n nÃ o kÃ©o mÃ y trá»Ÿ láº¡i Ã¡nh sÃ¡ng."
+    },
+    {
+      "id": "DIA_R_EYES_01",
+      "type": "manipulation_red",
+      "trigger": "eyes_closed_long",
+      "text": "MÃ y thÃ­ch bÃ³ng tá»‘i vÃ¬ nÃ³ khÃ´ng Ä‘áº·t cÃ¢u há»i. Cá»© á»Ÿ láº¡i Ä‘Ã¢y. Cá»© nháº¯m máº¯t mÃ£i Ä‘i. Äá»«ng bao giá» má»Ÿ ra thÃªm láº§n nÃ o ná»¯a."
+    },
+
+
+    {
+      "id": "DIA_W_MEM_01",
+      "type": "survival_white",
+      "trigger": "found_memory_core",
+      "text": "Máº£nh kÃ½ á»©c Ä‘Æ°á»£c tÃ­ch há»£p. Xá»­ lÃ½. Bá» qua pháº£n á»©ng cáº£m xÃºc Ä‘i kÃ¨m. Tiáº¿p tá»¥c di chuyá»ƒn."
+    },
+    {
+      "id": "DIA_W_MEM_02",
+      "type": "survival_white",
+      "trigger": "found_memory_core",
+      "text": "Dá»¯ liá»‡u Ä‘Æ°á»£c tÃ­ch há»£p. Há»‡ thá»‘ng á»•n Ä‘á»‹nh hÆ¡n 0.3%. Äá»«ng diá»…n giáº£i nÃ³ theo nghÄ©a khÃ¡c â€” Ä‘Ã³ chá»‰ lÃ  dá»¯ liá»‡u."
+    },
+    {
+      "id": "DIA_R_MEM_01",
+      "type": "manipulation_red",
+      "trigger": "found_memory_core",
+      "text": "MÃ y nhá»› láº¡i Ä‘á»ƒ lÃ m gÃ¬? Äá»ƒ Ä‘au hÆ¡n thÃ´i. Má»—i máº£nh kÃ½ á»©c mÃ y gom vÃ o lÃ  thÃªm má»™t thá»© nháº¯c mÃ y vá» nhá»¯ng gÃ¬ mÃ y Ä‘Ã£ phÃ¡ há»§y."
+    },
+    {
+      "id": "DIA_R_MEM_02",
+      "type": "manipulation_red",
+      "trigger": "found_memory_core",
+      "text": "Dá»¯ liá»‡u nÃ y thuá»™c vá» 'LÃ¡ cháº¯n'. MÃ y khÃ´ng cÃ³ quyá»n mang nÃ³ theo â€” mÃ y Ä‘Ã£ bá» nÃ³ láº¡i Ä‘á»ƒ tá»± cá»©u mÃ¬nh rá»“i. Nhá»¯ng thá»© nÃ y khÃ´ng pháº£i cá»§a mÃ y."
+    },
+
+
+    {
+      "id": "DIA_W_COMP_01",
+      "type": "survival_white",
+      "trigger": "compass_active",
+      "text": "Vestige Needle Ä‘ang phÃ¢n tÃ­ch luá»“ng kÃ½ á»©c. CÃ³ 30% xÃ¡c suáº¥t tÃ­n hiá»‡u bá»‹ nhiá»…u. Äá»«ng tin hoÃ n toÃ n â€” nhÆ°ng cÅ©ng Ä‘á»«ng bá» qua."
+    },
+    {
+      "id": "DIA_R_COMP_01",
+      "type": "manipulation_red",
+      "trigger": "compass_active",
+      "text": "Rá»… la bÃ n Ä‘ang Ä‘Ã¢m sÃ¢u hÆ¡n vÃ o máº¡ch mÃ¡u mÃ y má»—i khi nÃ³ rung. NÃ³ khÃ´ng dáº«n mÃ y vá» nhÃ  â€” khÃ´ng cÃ³ nhÃ  nÃ o Ä‘á»ƒ vá». NÃ³ Ã¡p giáº£i mÃ y Ä‘áº¿n nÆ¡i phÃ¡n xÃ©t thÃ´i."
+    },
+    {
+      "id": "DIA_R_COMP_02",
+      "type": "manipulation_red",
+      "trigger": "compass_active",
+      "text": "MÃ y cáº£m tháº¥y rá»… kim loáº¡i Ä‘Ã³ kÃ©o cÄƒng trong tay trÃ¡i khÃ´ng? ÄÃ³ khÃ´ng pháº£i chiáº¿c la bÃ n Ä‘ang chá»‰ Ä‘Æ°á»ng â€” Ä‘Ã³ lÃ  gÃ´ng cÃ¹m Ä‘ang siáº¿t cháº·t hÆ¡n."
+    },
+
+
+    {
+      "id": "DIA_W_ECHO_01",
+      "type": "survival_white",
+      "trigger": "echo_interrupt",
+      "text": "Giao thoa dá»¯ liá»‡u phÃ¡t hiá»‡n. Cáº¯t káº¿t ná»‘i luá»“ng kÃ½ á»©c ngoáº¡i lai â€” dá»¯ liá»‡u cá»§a ngÆ°á»i cháº¿t khÃ´ng thá»ƒ ghi Ä‘Ã¨ há»‡ thá»‘ng Ä‘ang váº­n hÃ nh."
+    },
+    {
+      "id": "DIA_R_ECHO_01",
+      "type": "manipulation_red",
+      "trigger": "echo_interrupt",
+      "text": "MÃ y cáº¯t ngang chu ká»³ cá»§a chÃºng vÃ¬ mÃ y sá»£ nhÃ¬n tháº¥y chÃ­nh mÃ¬nh láº·p láº¡i trong Ä‘Ã³. Má»™t vÃ²ng láº·p vÃ´ táº­n khÃ´ng cÃ³ Ä‘iá»ƒm thoÃ¡t â€” Ä‘Ã³ khÃ´ng pháº£i lá»i nguyá»n cá»§a chÃºng, Ä‘Ã³ lÃ  tÆ°Æ¡ng lai cá»§a mÃ y."
+    },
+
+
+    {
+      "id": "DIA_W_BOSS_01",
+      "type": "survival_white",
+      "trigger": "boss_wave_incoming",
+      "text": "SÃ³ng Ã¢m chá»¯ Ä‘á» chuáº©n bá»‹ phÃ³ng chiáº¿u. Nháº¯m máº¯t ngay â€” 3... 2... 1. Giá»¯ cho Ä‘áº¿n khi tÃ­n hiá»‡u hÆ¡i nÆ°á»›c táº£n nhiá»‡t ngá»«ng gÃ o."
+    },
+    {
+      "id": "DIA_W_BOSS_02",
+      "type": "survival_white",
+      "trigger": "boss_downtime",
+      "text": "Thá»±c thá»ƒ bá»‹ quÃ¡ nhiá»‡t. Cá»­a sá»• vÃ ng: 5 Ä‘áº¿n 7 giÃ¢y. Láº¿t. Náº¥p. Táº­n dá»¥ng â€” khÃ´ng cÃ³ láº§n thá»© hai."
+    },
+    {
+      "id": "DIA_R_BOSS_01",
+      "type": "manipulation_red",
+      "trigger": "boss_wave_incoming",
+      "text": "Nghe tiáº¿ng gÃ o cá»§a nÃ³ khÃ´ng? ÄÃ³ khÃ´ng pháº£i quÃ¡i váº­t â€” Ä‘Ã³ lÃ  tiáº¿ng mÃ y sáº½ phÃ¡t ra khi táº¥t cáº£ lá»—i dá»¯ liá»‡u trong mÃ y trÃ n ra ngoÃ i cÃ¹ng má»™t lÃºc. Thá»© kia chá»‰ lÃ  phiÃªn báº£n trung thá»±c hÆ¡n cá»§a mÃ y."
+    },
+
+
+    {
+      "id": "DIA_W_GEN_01",
+      "type": "survival_white",
+      "trigger": "generic",
+      "text": "Táº­p trung. MÃ y khÃ´ng cáº§n lÃ½ do Ä‘á»ƒ láº¿t tiáº¿p. MÃ y chá»‰ cáº§n láº¿t tiáº¿p."
+    },
+    {
+      "id": "DIA_W_GEN_02",
+      "type": "survival_white",
+      "trigger": "generic",
+      "text": "Module cáº£m xÃºc gÃ¢y nhiá»…u há»‡ thá»‘ng Ä‘Ã£ bá»‹ vÃ´ hiá»‡u hÃ³a. Chá»‰ cÃ²n dá»¯ liá»‡u di chuyá»ƒn."
+    },
+    {
+      "id": "DIA_R_GEN_01",
+      "type": "manipulation_red",
+      "trigger": "generic",
+      "text": "MÃ y khÃ´ng pháº£i anh hÃ¹ng. MÃ y lÃ  má»™t tá»‡p tin lá»—i Ä‘ang Ä‘Æ°á»£c Ã¡p giáº£i Ä‘áº¿n nÆ¡i xÃ³a sá»• â€” vÃ  chiáº¿c la bÃ n trong tay mÃ y lÃ  báº±ng chá»©ng."
+    },
+    {
+      "id": "DIA_R_GEN_02",
+      "type": "manipulation_red",
+      "trigger": "generic",
+      "text": "Há»‡ thá»‘ng tÆ°á»ng lá»­a cá»§a mÃ y Ä‘ang rÃ² rá»‰. Ta Ä‘Ã£ á»Ÿ trong nÃ y tá»« trÆ°á»›c khi mÃ y nháº­n ra ta tá»“n táº¡i. VÃ  ta sáº½ váº«n á»Ÿ Ä‘Ã¢y sau khi mÃ y táº¯t nguá»“n."
+    },
+    {
+      "id": "DIA_R_GEN_03",
+      "type": "manipulation_red",
+      "trigger": "generic",
+      "text": "Láº¿t thÃªm lÃ m gÃ¬ ná»¯a? á»ž Ä‘Ã¢y tá»‘i, nhÆ°ng áº¥m Ã¡p mÃ ... Náº±m xuá»‘ng Ä‘i. Äá»ƒ tiáº¿ng quáº¡t táº£n nhiá»‡t trong cá»• há»ng mÃ y tá»± táº¯t theo nhá»‹p thá»Ÿ cuá»‘i."
+    }
+  ]
+}
+

@@ -1,0 +1,164 @@
+[gd_scene format=3 uid="uid://51x05mvphesu"]
+
+[ext_resource type="Script" path="res://scripts/entities/Mrak.gd" id="1_mrak"]
+[ext_resource type="Script" path="res://scripts/entities/MrakBody.gd" id="2_mrakbody"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_stand"]
+radius = 8.0
+height = 32.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_crouch"]
+radius = 8.0
+height = 14.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_sound"]
+radius = 190.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interact"]
+radius = 36.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body_detect"]
+radius = 6.0
+
+[node name="Mrak" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_mrak")
+
+; ── Placeholder visual until Aseprite art is ready ──
+[node name="PlaceholderSprite" type="ColorRect" parent="."]
+offset_left = -9.0
+offset_top = -48.0
+offset_right = 9.0
+offset_bottom = 0.0
+color = Color(0.0, 1.0, 0.8, 1.0)
+
+; Chest detail (battery indicator tint)
+[node name="ChestGlow" type="ColorRect" parent="PlaceholderSprite"]
+offset_left = 2.0
+offset_top = 12.0
+offset_right = 14.0
+offset_bottom = 22.0
+color = Color(0.0, 0.9, 0.6, 0.8)
+
+; Heat core dot
+[node name="CoreDot" type="ColorRect" parent="PlaceholderSprite"]
+offset_left = 5.0
+offset_top = 18.0
+offset_right = 11.0
+offset_bottom = 24.0
+color = Color(0.0, 1.0, 0.8, 1.0)
+
+; ── Standing collision ──
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -24)
+shape = SubResource("CapsuleShape2D_stand")
+
+; ── Crouched collision (disabled by default) ──
+[node name="CrouchShape" type="CollisionShape2D" parent="."]
+position = Vector2(0, -11)
+disabled = true
+shape = SubResource("CapsuleShape2D_crouch")
+
+; ── Sound emission area (detected by enemy audio check) ──
+[node name="SoundEmissionArea" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+
+[node name="SoundShape" type="CollisionShape2D" parent="SoundEmissionArea"]
+shape = SubResource("CircleShape2D_sound")
+
+; ── Interaction detection area ──
+[node name="InteractArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+
+[node name="InteractShape" type="CollisionShape2D" parent="InteractArea"]
+shape = SubResource("CircleShape2D_interact")
+
+; ── Diegetic body stats node ──
+[node name="MrakBody" type="Node2D" parent="."]
+script = ExtResource("2_mrakbody")
+
+[node name="PinGlow" type="PointLight2D" parent="MrakBody"]
+position = Vector2(0, -32)
+color = Color(0.0, 1.0, 0.8, 1.0)
+energy = 0.7
+texture_scale = 0.4
+
+[node name="ThermalCore" type="Sprite2D" parent="MrakBody"]
+position = Vector2(0, -28)
+scale = Vector2(0.15, 0.15)
+modulate = Color(0.0, 1.0, 0.8, 1.0)
+
+[node name="NecrosisOverlay" type="Sprite2D" parent="MrakBody"]
+visible = false
+modulate = Color(0.8, 0.0, 0.0, 0.0)
+
+[node name="NecrosisLabel" type="Label" parent="MrakBody"]
+position = Vector2(12, -10)
+size = Vector2(60, 20)
+theme_override_font_sizes/font_size = 10
+modulate = Color(0.8, 0.0, 0.0, 0.0)
+text = "0%"
+
+[node name="SpineShards" type="Node2D" parent="MrakBody"]
+
+; 5 spine gai markers — hidden until memory shards collected
+[node name="Shard0" type="ColorRect" parent="MrakBody/SpineShards"]
+visible = false
+offset_left = 3.0
+offset_top = -40.0
+offset_right = 7.0
+offset_bottom = -36.0
+color = Color(0.0, 1.0, 0.8, 0.9)
+
+[node name="Shard1" type="ColorRect" parent="MrakBody/SpineShards"]
+visible = false
+offset_left = 3.0
+offset_top = -35.0
+offset_right = 7.0
+offset_bottom = -31.0
+color = Color(0.0, 1.0, 0.8, 0.9)
+
+[node name="Shard2" type="ColorRect" parent="MrakBody/SpineShards"]
+visible = false
+offset_left = 3.0
+offset_top = -30.0
+offset_right = 7.0
+offset_bottom = -26.0
+color = Color(0.0, 1.0, 0.8, 0.9)
+
+[node name="Shard3" type="ColorRect" parent="MrakBody/SpineShards"]
+visible = false
+offset_left = 3.0
+offset_top = -25.0
+offset_right = 7.0
+offset_bottom = -21.0
+color = Color(0.0, 1.0, 0.8, 0.9)
+
+[node name="Shard4" type="ColorRect" parent="MrakBody/SpineShards"]
+visible = false
+offset_left = 3.0
+offset_top = -20.0
+offset_right = 7.0
+offset_bottom = -16.0
+color = Color(0.0, 1.0, 0.8, 0.9)
+
+[node name="FlickerTimer" type="Timer" parent="MrakBody"]
+wait_time = 0.18
+one_shot = false
+autostart = false
+
+; ── UI layer (fullscreen blink overlay) ──
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="BlinkOverlay" type="ColorRect" parent="UILayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0, 0.0, 0.0, 0.0)
+mouse_filter = 2

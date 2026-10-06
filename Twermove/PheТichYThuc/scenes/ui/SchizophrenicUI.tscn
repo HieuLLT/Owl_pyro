@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://suiscene2025"]
+
+[ext_resource type="Script" path="res://scripts/systems/SchizophrenicUI.gd" id="1_sui"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
+shader = null
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_glitch"]
+shader = null
+
+[node name="SchizophrenicUI" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_sui")
+
+; ── FIREWALL layer — top-left log ──
+[node name="FirewallLayer" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 480.0
+offset_bottom = 220.0
+mouse_filter = 2
+
+[node name="FirewallLog" type="RichTextLabel" parent="FirewallLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+scroll_following = true
+theme_override_font_sizes/normal_font_size = 11
+text = ""
+mouse_filter = 2
+
+; ── MEMORY LEAK floating text container ──
+[node name="MemoryLeakLayer" type="Node2D" parent="."]
+
+; ── Dynamic vignette overlay ──
+[node name="VignetteOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0, 0.0, 0.0, 0.0)
+mouse_filter = 2
+
+; ── CRT scanline overlay ──
+[node name="CRTOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1.0, 1.0, 1.0, 0.06)
+mouse_filter = 2
+
+; ── Glitch displacement overlay ──
+[node name="GlitchOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1.0, 1.0, 1.0, 0.0)
+mouse_filter = 2
+
+; ── Chaos shake timer ──
+[node name="ChaosShakeTimer" type="Timer" parent="."]
+wait_time = 0.08
+one_shot = false
+autostart = false

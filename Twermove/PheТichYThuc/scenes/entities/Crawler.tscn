@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://1m5cxpxt0tdg"]
+
+[ext_resource type="Script" path="res://scripts/entities/enemies/Crawler.gd" id="1_crawler"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 10.0
+height = 28.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vision"]
+radius = 220.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sound_detect"]
+size = Vector2(400, 400)
+
+[node name="Crawler" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_crawler")
+
+; ── Placeholder visual — dark angular shape ──
+[node name="PlaceholderSprite" type="ColorRect" parent="."]
+offset_left = -10.0
+offset_top = -32.0
+offset_right = 10.0
+offset_bottom = 0.0
+color = Color(0.35, 0.18, 0.22, 1.0)
+
+; Eye glow
+[node name="EyeGlow" type="ColorRect" parent="PlaceholderSprite"]
+offset_left = 2.0
+offset_top = 4.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0.9, 0.1, 0.1, 1.0)
+
+; ── Body collision ──
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -16)
+shape = SubResource("CapsuleShape2D_body")
+
+; ── Vision detection area (light-based) ──
+[node name="VisionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="VisionShape" type="CollisionShape2D" parent="VisionArea"]
+shape = SubResource("CircleShape2D_vision")
+
+; ── Sound detection area (overlaps мрак SoundEmissionArea) ──
+[node name="SoundDetectArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+
+[node name="SoundDetectShape" type="CollisionShape2D" parent="SoundDetectArea"]
+shape = SubResource("RectangleShape2D_sound_detect")
+
+; ── Debug state label ──
+[node name="DebugLabel" type="Label" parent="."]
+position = Vector2(-20, -50)
+size = Vector2(80, 20)
+theme_override_font_sizes/font_size = 9
+modulate = Color(1, 0.8, 0, 0.8)
+text = "IDLE"
+
+; ── Navigation ──
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 10.0
+target_desired_distance = 10.0

@@ -1,0 +1,252 @@
+[gd_scene format=3 uid="uid://d33vwbbulj1fg"]
+
+[ext_resource type="PackedScene" uid="uid://51x05mvphesu" path="res://scenes/entities/Mrak.tscn" id="1_mrak"]
+[ext_resource type="PackedScene" uid="uid://suiscene2025" path="res://scenes/ui/SchizophrenicUI.tscn" id="2_sui"]
+[ext_resource type="PackedScene" uid="uid://1m5cxpxt0tdg" path="res://scenes/entities/Crawler.tscn" id="3_crawler"]
+[ext_resource type="Script" uid="uid://c23do4stfem7d" path="res://scripts/systems/SensoryDeprivation.gd" id="4_sd"]
+[ext_resource type="Script" uid="uid://bkn5vsnchjwov" path="res://scripts/systems/VestigeNeedle.gd" id="5_vn"]
+[ext_resource type="Script" uid="uid://br4b35mgklhq2" path="res://scripts/systems/BootSequence.gd" id="6_boot"]
+
+[sub_resource type="RectangleShape2D" id="Rect_ground"]
+size = Vector2(2400, 32)
+
+[sub_resource type="RectangleShape2D" id="Rect_wall_left"]
+size = Vector2(32, 600)
+
+[sub_resource type="RectangleShape2D" id="Rect_wall_right"]
+size = Vector2(32, 600)
+
+[sub_resource type="RectangleShape2D" id="Rect_ceiling"]
+size = Vector2(2400, 32)
+
+[sub_resource type="RectangleShape2D" id="Rect_plat1"]
+size = Vector2(300, 20)
+
+[sub_resource type="RectangleShape2D" id="Rect_plat2"]
+size = Vector2(200, 20)
+
+[sub_resource type="RectangleShape2D" id="Rect_pillar1"]
+size = Vector2(32, 200)
+
+[sub_resource type="RectangleShape2D" id="Rect_pillar2"]
+size = Vector2(32, 200)
+
+[node name="Floor_0" type="Node2D" unique_id=2107341709]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=198792145]
+
+[node name="Level" type="Node2D" parent="." unique_id=1863802244]
+
+[node name="Ground" type="StaticBody2D" parent="Level" unique_id=1039583705]
+position = Vector2(1200, 420)
+collision_layer = 3
+collision_mask = 0
+
+[node name="GroundShape" type="CollisionShape2D" parent="Level/Ground" unique_id=106303628]
+shape = SubResource("Rect_ground")
+
+[node name="GroundVisual" type="ColorRect" parent="Level/Ground" unique_id=1777044640]
+offset_left = -1200.0
+offset_top = -16.0
+offset_right = 1200.0
+offset_bottom = 16.0
+color = Color(0.165, 0.165, 0.204, 1)
+
+[node name="WallLeft" type="StaticBody2D" parent="Level" unique_id=379275840]
+position = Vector2(-16, 120)
+collision_layer = 3
+collision_mask = 0
+
+[node name="WallLeftShape" type="CollisionShape2D" parent="Level/WallLeft" unique_id=1595538004]
+shape = SubResource("Rect_wall_left")
+
+[node name="WallLeftVisual" type="ColorRect" parent="Level/WallLeft" unique_id=2050091133]
+offset_left = -16.0
+offset_top = -300.0
+offset_right = 16.0
+offset_bottom = 300.0
+color = Color(0.104, 0.104, 0.137, 1)
+
+[node name="WallRight" type="StaticBody2D" parent="Level" unique_id=1375846393]
+position = Vector2(2416, 120)
+collision_layer = 3
+collision_mask = 0
+
+[node name="WallRightShape" type="CollisionShape2D" parent="Level/WallRight" unique_id=350277284]
+shape = SubResource("Rect_wall_right")
+
+[node name="WallRightVisual" type="ColorRect" parent="Level/WallRight" unique_id=954794336]
+offset_left = -16.0
+offset_top = -300.0
+offset_right = 16.0
+offset_bottom = 300.0
+color = Color(0.104, 0.104, 0.137, 1)
+
+[node name="Ceiling" type="StaticBody2D" parent="Level" unique_id=1617183484]
+position = Vector2(1200, -180)
+collision_layer = 3
+collision_mask = 0
+
+[node name="CeilingShape" type="CollisionShape2D" parent="Level/Ceiling" unique_id=535698109]
+shape = SubResource("Rect_ceiling")
+
+[node name="CeilingVisual" type="ColorRect" parent="Level/Ceiling" unique_id=1565907683]
+offset_left = -1200.0
+offset_top = -16.0
+offset_right = 1200.0
+offset_bottom = 16.0
+color = Color(0.104, 0.104, 0.137, 1)
+
+[node name="Platform1" type="StaticBody2D" parent="Level" unique_id=742703436]
+position = Vector2(400, 250)
+collision_layer = 3
+collision_mask = 0
+
+[node name="Plat1Shape" type="CollisionShape2D" parent="Level/Platform1" unique_id=1814000367]
+shape = SubResource("Rect_plat1")
+
+[node name="Plat1Visual" type="ColorRect" parent="Level/Platform1" unique_id=1336269674]
+offset_left = -150.0
+offset_top = -10.0
+offset_right = 150.0
+offset_bottom = 10.0
+color = Color(0.165, 0.165, 0.204, 1)
+
+[node name="Platform2" type="StaticBody2D" parent="Level" unique_id=545686957]
+position = Vector2(1600, 300)
+collision_layer = 3
+collision_mask = 0
+
+[node name="Plat2Shape" type="CollisionShape2D" parent="Level/Platform2" unique_id=1175061524]
+shape = SubResource("Rect_plat2")
+
+[node name="Plat2Visual" type="ColorRect" parent="Level/Platform2" unique_id=1807553800]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.165, 0.165, 0.204, 1)
+
+[node name="Pillar1" type="StaticBody2D" parent="Level" unique_id=531017101]
+position = Vector2(600, 320)
+collision_layer = 3
+collision_mask = 0
+
+[node name="Pillar1Shape" type="CollisionShape2D" parent="Level/Pillar1" unique_id=1918165220]
+shape = SubResource("Rect_pillar1")
+
+[node name="Pillar1Visual" type="ColorRect" parent="Level/Pillar1" unique_id=986393187]
+offset_left = -16.0
+offset_top = -100.0
+offset_right = 16.0
+offset_bottom = 100.0
+color = Color(0.149, 0.149, 0.196, 1)
+
+[node name="Pillar2" type="StaticBody2D" parent="Level" unique_id=1412431664]
+position = Vector2(1800, 320)
+collision_layer = 3
+collision_mask = 0
+
+[node name="Pillar2Shape" type="CollisionShape2D" parent="Level/Pillar2" unique_id=617720487]
+shape = SubResource("Rect_pillar2")
+
+[node name="Pillar2Visual" type="ColorRect" parent="Level/Pillar2" unique_id=1882026255]
+offset_left = -16.0
+offset_top = -100.0
+offset_right = 16.0
+offset_bottom = 100.0
+color = Color(0.149, 0.149, 0.196, 1)
+
+[node name="WallCracks" type="Node2D" parent="Level" unique_id=659424580]
+
+[node name="Crack1" type="ColorRect" parent="Level/WallCracks" unique_id=145057]
+offset_left = -1.0
+offset_top = -30.0
+offset_right = 1.0
+offset_bottom = 30.0
+color = Color(0.039, 0.039, 0.059, 0.7)
+
+[node name="Crack2" type="ColorRect" parent="Level/WallCracks" unique_id=575495721]
+offset_left = -1.0
+offset_top = -20.0
+offset_right = 1.0
+offset_bottom = 20.0
+color = Color(0.039, 0.039, 0.059, 0.7)
+
+[node name="Crack3" type="ColorRect" parent="Level/WallCracks" unique_id=1653118697]
+offset_left = -1.0
+offset_top = -40.0
+offset_right = 1.0
+offset_bottom = 40.0
+color = Color(0.039, 0.039, 0.059, 0.7)
+
+[node name="DripEffect1" type="CPUParticles2D" parent="Level" unique_id=401036969]
+position = Vector2(500, -150)
+lifetime = 3.0
+direction = Vector2(0, 1)
+spread = 5.0
+gravity = Vector2(0, 60)
+initial_velocity_min = 20.0
+initial_velocity_max = 40.0
+color = Color(0.039, 0.039, 0.059, 0.6)
+
+[node name="ExitTrigger" type="Area2D" parent="." unique_id=469661835]
+position = Vector2(2200, 380)
+collision_layer = 0
+collision_mask = 4
+
+[node name="ExitShape" type="CollisionShape2D" parent="ExitTrigger" unique_id=612561071]
+shape = SubResource("Rect_plat2")
+
+[node name="ExitVisual" type="ColorRect" parent="ExitTrigger" unique_id=1397365517]
+offset_left = -40.0
+offset_top = -60.0
+offset_right = 40.0
+color = Color(0, 0.4, 0.3, 0.15)
+
+[node name="ExitLabel" type="Label" parent="ExitTrigger" unique_id=428921483]
+modulate = Color(0, 0.8, 0.6, 0.5)
+offset_left = -60.0
+offset_top = -80.0
+offset_right = 60.0
+offset_bottom = -57.0
+theme_override_font_sizes/font_size = 10
+text = ">>> DEEPER ..."
+
+[node name="CrawlerWaypoints" type="Node2D" parent="." unique_id=781120169]
+
+[node name="WP_A" type="Marker2D" parent="CrawlerWaypoints" unique_id=1340468988]
+position = Vector2(400, 400)
+
+[node name="WP_B" type="Marker2D" parent="CrawlerWaypoints" unique_id=1765111167]
+position = Vector2(900, 400)
+
+[node name="WP_C" type="Marker2D" parent="CrawlerWaypoints" unique_id=1220436922]
+position = Vector2(1300, 400)
+
+[node name="Mrak" parent="." unique_id=1832024887 instance=ExtResource("1_mrak")]
+position = Vector2(120, 370)
+
+[node name="Camera2D" type="Camera2D" parent="Mrak" unique_id=548076750]
+position = Vector2(0, -20)
+zoom = Vector2(2, 2)
+limit_left = 0
+limit_top = -180
+limit_right = 2400
+limit_bottom = 420
+position_smoothing_enabled = true
+
+[node name="Crawler" parent="." unique_id=421191649 instance=ExtResource("3_crawler")]
+position = Vector2(800, 400)
+patrol_points = Array[NodePath]([NodePath("../CrawlerWaypoints/WP_A"), NodePath("../CrawlerWaypoints/WP_B"), NodePath("../CrawlerWaypoints/WP_C")])
+
+[node name="SchizophrenicUI" parent="." unique_id=1088974271 instance=ExtResource("2_sui")]
+
+[node name="SensoryDeprivation" type="Node" parent="." unique_id=633749463]
+script = ExtResource("4_sd")
+
+[node name="VestigeNeedle" type="Node2D" parent="." unique_id=335093572]
+script = ExtResource("5_vn")
+
+[node name="BootSequenceTrigger" type="Node" parent="." unique_id=640790653]
+script = ExtResource("6_boot")
