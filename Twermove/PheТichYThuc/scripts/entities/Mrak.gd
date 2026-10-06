@@ -72,6 +72,12 @@ func _ready() -> void:
 	if crouch_shape:
 		crouch_shape.disabled = true
 	_update_sound_radius()
+	# Drive the glitch body shader (mrak_glitch_body.gdshader)
+	_body_material = _find_body_material()
+	EventBus.mrak_necrosis_changed.connect(_on_necrosis_for_shader)
+	EventBus.mrak_pin_changed.connect(_on_pin_for_shader)
+	_on_necrosis_for_shader(GameManager.necrosis)
+	_on_pin_for_shader(GameManager.pin)
 	EventBus.firewall_speak.emit("мрак — SYSTEM BOOT. NECROSIS: %.1f%%" % GameManager.necrosis)
 
 func _physics_process(delta: float) -> void:
@@ -117,12 +123,14 @@ func _handle_movement(delta: float) -> void:
 		velocity.x = dir * speed
 		is_moving = dir != 0.0
 
-	# Sprite direction
+	# Sprite direction (sprite is null while the ColorRect placeholder is used)
 	if dir > 0.0:
-		sprite.flip_h = false
+		if sprite:
+			sprite.flip_h = false
 		facing_right = true
 	elif dir < 0.0:
-		sprite.flip_h = true
+		if sprite:
+			sprite.flip_h = true
 		facing_right = false
 
 	# Animation
@@ -170,6 +178,28 @@ func _on_blink_changed(blind: bool) -> void:
 			var stop_tween := create_tween()
 			stop_tween.tween_interval(0.5)
 			stop_tween.tween_callback(heartbeat_player.stop)
+
+# ─────────────────────────────────────────────
+# GLITCH BODY SHADER BRIDGE
+# ─────────────────────────────────────────────
+
+var _body_material: ShaderMaterial = null
+
+func _find_body_material() -> ShaderMaterial:
+	var target: CanvasItem = placeholder_sprite if placeholder_sprite else sprite
+	if target and target.material is ShaderMaterial:
+		return target.material as ShaderMaterial
+	return null
+
+func _on_necrosis_for_shader(value: float) -> void:
+	if _body_material:
+		_body_material.set_shader_parameter("necrosis", clampf(value / 100.0, 0.0, 1.0))
+		# Heart beats faster the more decayed мрак is: 60 -> 110 BPM
+		_body_material.set_shader_parameter("heartbeat_bpm", lerpf(60.0, 110.0, value / 100.0))
+
+func _on_pin_for_shader(value: float) -> void:
+	if _body_material:
+		_body_material.set_shader_parameter("pin_level", clampf(value / 100.0, 0.0, 1.0))
 
 # ─────────────────────────────────────────────
 # CROUCH

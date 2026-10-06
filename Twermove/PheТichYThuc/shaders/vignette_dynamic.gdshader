@@ -7,9 +7,9 @@ shader_type canvas_item;
 uniform float necrosis_level: hint_range(0.0, 1.0) = 0.0;
 uniform float base_strength: hint_range(0.0, 3.0) = 0.6;
 
+// NOTE: outputs a black overlay whose alpha grows toward the edges, so it works on a
+// fullscreen ColorRect (SchizophrenicUI/VignetteOverlay) without needing a texture.
 void fragment() {
-	vec4 col = texture(TEXTURE, UV);
-
 	vec2 center = UV - vec2(0.5);
 
 	// Base vignette + necrosis bonus
@@ -21,6 +21,5 @@ void fragment() {
 	float pulse = sin(TIME * 1.2) * 0.04 * necrosis_level;
 	vignette -= pulse;
 
-	col.rgb *= clamp(vignette, 0.0, 1.0);
-	COLOR = col;
+	COLOR = vec4(0.0, 0.0, 0.0, 1.0 - clamp(vignette, 0.0, 1.0));
 }

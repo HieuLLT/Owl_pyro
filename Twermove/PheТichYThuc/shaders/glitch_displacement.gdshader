@@ -8,6 +8,8 @@ shader_type canvas_item;
 uniform float glitch_intensity: hint_range(0.0, 1.0) = 0.0;
 uniform sampler2D noise_texture: hint_default_white;
 uniform float time_scale: hint_range(0.1, 10.0) = 3.0;
+// Reads the already-rendered screen so it works on a fullscreen ColorRect overlay.
+uniform sampler2D screen_tex : hint_screen_texture, repeat_disable, filter_nearest;
 
 void fragment() {
 	float t = TIME * time_scale;
@@ -22,10 +24,10 @@ void fragment() {
 
 	// Sample RGB at different offsets
 	vec4 col;
-	col.r = texture(TEXTURE, UV + vec2(shift_x * 1.5, 0.0)).r;
-	col.g = texture(TEXTURE, UV + vec2(shift_x * 0.5, 0.0)).g;
-	col.b = texture(TEXTURE, UV - vec2(shift_x, 0.0)).b;
-	col.a = texture(TEXTURE, UV).a;
+	col.r = texture(screen_tex, SCREEN_UV + vec2(shift_x * 1.5, 0.0)).r;
+	col.g = texture(screen_tex, SCREEN_UV + vec2(shift_x * 0.5, 0.0)).g;
+	col.b = texture(screen_tex, SCREEN_UV - vec2(shift_x, 0.0)).b;
+	col.a = 1.0;
 
 	COLOR = col;
 }

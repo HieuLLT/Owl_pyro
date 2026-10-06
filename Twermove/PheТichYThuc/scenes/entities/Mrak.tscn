@@ -2,6 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/entities/Mrak.gd" id="1_mrak"]
 [ext_resource type="Script" path="res://scripts/entities/MrakBody.gd" id="2_mrakbody"]
+[ext_resource type="Shader" path="res://shaders/mrak_glitch_body.gdshader" id="3_glitchbody"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_body"]
+shader = ExtResource("3_glitchbody")
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_stand"]
 radius = 8.0
@@ -27,6 +31,7 @@ script = ExtResource("1_mrak")
 
 ; ── Placeholder visual until Aseprite art is ready ──
 [node name="PlaceholderSprite" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_body")
 offset_left = -9.0
 offset_top = -48.0
 offset_right = 9.0
@@ -35,6 +40,7 @@ color = Color(0.0, 1.0, 0.8, 1.0)
 
 ; Chest detail (battery indicator tint)
 [node name="ChestGlow" type="ColorRect" parent="PlaceholderSprite"]
+use_parent_material = true
 offset_left = 2.0
 offset_top = 12.0
 offset_right = 14.0
@@ -43,6 +49,7 @@ color = Color(0.0, 0.9, 0.6, 0.8)
 
 ; Heat core dot
 [node name="CoreDot" type="ColorRect" parent="PlaceholderSprite"]
+use_parent_material = true
 offset_left = 5.0
 offset_top = 18.0
 offset_right = 11.0

@@ -6,6 +6,14 @@
 [ext_resource type="Script" uid="uid://c23do4stfem7d" path="res://scripts/systems/SensoryDeprivation.gd" id="4_sd"]
 [ext_resource type="Script" uid="uid://bkn5vsnchjwov" path="res://scripts/systems/VestigeNeedle.gd" id="5_vn"]
 [ext_resource type="Script" uid="uid://br4b35mgklhq2" path="res://scripts/systems/BootSequence.gd" id="6_boot"]
+[ext_resource type="Shader" path="res://shaders/erasure_static.gdshader" id="7_erasure_shader"]
+[ext_resource type="Script" path="res://scripts/systems/ErasureZone.gd" id="8_erasure_zone"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_erasure"]
+shader = ExtResource("7_erasure_shader")
+
+[sub_resource type="RectangleShape2D" id="Rect_erasure"]
+size = Vector2(48, 80)
 
 [sub_resource type="RectangleShape2D" id="Rect_ground"]
 size = Vector2(2400, 32)
@@ -212,6 +220,24 @@ offset_right = 60.0
 offset_bottom = -57.0
 theme_override_font_sizes/font_size = 10
 text = ">>> DEEPER ..."
+
+; ── The Erasure: lethal static at the left edge (do not go back) ──
+[node name="ErasureZone" type="Area2D" parent="."]
+position = Vector2(24, 364)
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("8_erasure_zone")
+
+[node name="ErasureShape" type="CollisionShape2D" parent="ErasureZone"]
+shape = SubResource("Rect_erasure")
+
+[node name="ErasureVisual" type="ColorRect" parent="ErasureZone"]
+material = SubResource("ShaderMaterial_erasure")
+offset_left = -24.0
+offset_top = -40.0
+offset_right = 24.0
+offset_bottom = 40.0
+mouse_filter = 2
 
 [node name="CrawlerWaypoints" type="Node2D" parent="." unique_id=781120169]
 

@@ -43,7 +43,14 @@ var _vignette_mat: ShaderMaterial
 # INIT
 # ─────────────────────────────────────────────
 
+var _pool: VoiceTextPool = null
+
 func _ready() -> void:
+	# Pooled RichTextLabels for the Red voice (and world-anchored text)
+	_pool = VoiceTextPool.new()
+	add_child(_pool)
+	_pool.setup(leak_container, glitch_font)
+
 	# Connect signals
 	EventBus.firewall_speak.connect(_on_firewall_speak)
 	EventBus.memory_leak_speak.connect(_on_leak_speak)
@@ -82,7 +89,13 @@ func _rebuild_firewall_display() -> void:
 		var line: String = _firewall_lines[i]
 		if chaos_level > 0.7 and i < 2:
 			line = _corrupt_text(line, 0.15)
-		text += "[color=#C8C8D4" + alpha_hex + "]" + line + "[/color]\n"
+		# Escape "[" so message text can't be parsed as BBCode
+		line = line.replace("[", "[lb]")
+		var colored: String = "[color=#C8C8D4" + alpha_hex + "]" + line + "[/color]"
+		# Newest line breathes with a gentle wave
+		if i == _firewall_lines.size() - 1:
+			colored = "[wave amp=6 freq=1.5 connected=0]" + colored + "[/wave]"
+		text += colored + "\n"
 	firewall_log.text = text  # RichTextLabel with bbcode
 
 # ─────────────────────────────────────────────
@@ -90,46 +103,18 @@ func _rebuild_firewall_display() -> void:
 # ─────────────────────────────────────────────
 
 func _on_leak_speak(msg: String, intensity: float) -> void:
-	var label := _create_leak_label(msg, intensity)
-	leak_container.add_child(label)
-	# Auto-destroy
-	var timer := get_tree().create_timer(LEAK_TEXT_LIFETIME * (1.0 + intensity * 0.5))
-	timer.timeout.connect(label.queue_free)
+	# Random screen position — avoiding the dead centre. Labels come from the pool.
+	var pos := Vector2(randf_range(40.0, 1200.0), randf_range(40.0, 650.0))
+	_pool.show_text(msg, VoiceTextPool.Voice.RED, pos, intensity)
 
-func _create_leak_label(text: String, intensity: float) -> Label:
-	var label := Label.new()
-	label.text = text
-	if glitch_font:
-		label.add_theme_font_override("font", glitch_font)
+## Anchor a voice line to the world (over a Phantom, a data station, a wall…).
+## voice: VoiceTextPool.Voice.WHITE or .RED
+func speak_at_world(msg: String, voice: VoiceTextPool.Voice, world_pos: Vector2, intensity: float = 0.5) -> void:
+	_pool.show_world_text(msg, voice, world_pos, intensity)
 
-	# Color: deep red, slightly transparent
-	var r: float = 0.75 + intensity * 0.2
-	label.add_theme_color_override("font_color", Color(r, 0.05, 0.05, 0.85))
-	label.add_theme_font_size_override("font_size", int(lerp(14, 22, intensity)))
-
-	# Random floating position — avoiding dead center
-	label.position = Vector2(
-		randf_range(40.0, 1200.0),
-		randf_range(40.0, 650.0)
-	)
-
-	# Float upward and fade out
-	var tween := label.create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(label, "position:y", label.position.y - randf_range(30.0, 80.0),
-		LEAK_TEXT_LIFETIME)
-	tween.tween_property(label, "modulate:a", 0.0, LEAK_TEXT_LIFETIME * 0.7).set_delay(
-		LEAK_TEXT_LIFETIME * 0.3
-	)
-
-	# Glitch jitter for high-intensity messages
-	if intensity > 0.6:
-		var glitch_tween := label.create_tween()
-		glitch_tween.set_loops(int(LEAK_TEXT_LIFETIME * 8))
-		glitch_tween.tween_property(label, "position:x",
-			label.position.x + randf_range(-4.0, 4.0), 0.05)
-
-	return label
+## Hide all red text immediately (optional hook for Nhắm Mắt).
+func clear_leak_text() -> void:
+	_pool.clear_red()
 
 # ─────────────────────────────────────────────
 # CHAOS SYSTEM
