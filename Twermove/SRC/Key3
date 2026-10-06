@@ -1,8 +1,0 @@
-**HỒ SƠ BẢO MẬT: MẢNH KÝ ỨC BỊ GHI ĐÈ**
-
-**1\. Khối Dữ Liệu 1 &amp; 2 (Bài toán CTF - Steganography/Forensics):** *Được trích xuất từ 2 trạm rác. Bề ngoài là một chuỗi mã Hex tĩnh điện vô nghĩa.* Người chơi tò mò có thể nhận ra cấu trúc file bất thường. Nếu bóc tách lớp nhiễu sóng bằng các kỹ thuật phân tích tệp ẩn (tương tự việc dùng các công cụ phân tích chữ ký file để tìm dữ liệu bị giấu), họ sẽ trích xuất được hai chuỗi khóa (Key) được mã hóa. Hai khóa này sinh ra để mở cổng vào "Trạm Ký Ức Trung Tâm".
-
-**2\. Khối Dữ Liệu 3 (Lõi Sự Thật - Cội nguồn của Tiếng Nói):** *Nội dung giải mã:* "Giao thức phân vùng tâm lý thất bại. Tệp tin 'Tội Lỗi' quá lớn, không thể mã hóa. Hệ thống tự động chia rẽ ý thức làm hai để bảo vệ Lõi:
-
-* **Tiếng Nói Trắng (Sinh tồn):** Là giao thức tường lửa (Firewall) cuối cùng. Nó lạnh lùng, vô cảm, ép cơ thể tắt các module cảm xúc để sống sót bằng mọi giá.
-* **Tiếng Nói Đỏ (Thao túng):** Là rò rỉ bộ nhớ (Memory Leak) của chính bản thân vật chủ. Nó chứa toàn bộ sự hối hận, nỗi đau và khao khát được chết đi để chuộc lỗi. Nó không phải quái vật, nó chính là nhân tính còn sót lại đang mục nát."
