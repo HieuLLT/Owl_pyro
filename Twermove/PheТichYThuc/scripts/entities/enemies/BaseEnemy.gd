@@ -33,10 +33,10 @@ var _last_known_pos: Vector2 = Vector2.ZERO
 # ── NODE REFS ──────────────────────────────────────
 # sprite is optional — null until Aseprite art is assigned
 var sprite: AnimatedSprite2D = null
-@onready var nav_agent: NavigationAgent2D   = $NavigationAgent2D if has_node("NavigationAgent2D") else null
-@onready var vision_area: Area2D            = $VisionArea if has_node("VisionArea") else null
-@onready var sound_detect_area: Area2D      = $SoundDetectArea if has_node("SoundDetectArea") else null
-@onready var state_label: Label             = $DebugLabel if has_node("DebugLabel") else null
+@onready var nav_agent: NavigationAgent2D   = get_node_or_null("NavigationAgent2D")
+@onready var vision_area: Area2D            = get_node_or_null("VisionArea")
+@onready var sound_detect_area: Area2D      = get_node_or_null("SoundDetectArea")
+@onready var state_label: Label             = get_node_or_null("DebugLabel")
 
 # ─────────────────────────────────────────────
 # PATROL WAYPOINTS

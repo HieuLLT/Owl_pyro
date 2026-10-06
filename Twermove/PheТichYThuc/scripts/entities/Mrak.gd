@@ -32,16 +32,16 @@ const MOVE_HEAT_RATE: float = 1.5
 # All node refs are null-safe — game works with placeholder nodes
 var sprite: AnimatedSprite2D         = null   # set in _ready if present
 var placeholder_sprite: ColorRect    = null   # placeholder until art ready
-@onready var heat_core: PointLight2D = $HeatCore if has_node("HeatCore") else null
+@onready var heat_core: PointLight2D = get_node_or_null("HeatCore")
 @onready var collision_shape: CollisionShape2D  = $CollisionShape2D
-@onready var crouch_shape: CollisionShape2D     = $CrouchShape if has_node("CrouchShape") else null
-@onready var sound_area: Area2D      = $SoundEmissionArea if has_node("SoundEmissionArea") else null
-@onready var sound_collision: CollisionShape2D  = $SoundEmissionArea/SoundShape if has_node("SoundEmissionArea/SoundShape") else null
-@onready var interact_area: Area2D   = $InteractArea if has_node("InteractArea") else null
-@onready var blink_overlay: ColorRect = $UILayer/BlinkOverlay if has_node("UILayer/BlinkOverlay") else null
-@onready var heartbeat_player: AudioStreamPlayer = $HeartbeatPlayer if has_node("HeartbeatPlayer") else null
-@onready var footstep_player: AudioStreamPlayer  = $FootstepPlayer if has_node("FootstepPlayer") else null
-@onready var mrak_body: Node2D = $MrakBody if has_node("MrakBody") else null
+@onready var crouch_shape: CollisionShape2D     = get_node_or_null("CrouchShape")
+@onready var sound_area: Area2D      = get_node_or_null("SoundEmissionArea")
+@onready var sound_collision: CollisionShape2D  = get_node_or_null("SoundEmissionArea/SoundShape")
+@onready var interact_area: Area2D   = get_node_or_null("InteractArea")
+@onready var blink_overlay: ColorRect = get_node_or_null("UILayer/BlinkOverlay")
+@onready var heartbeat_player: AudioStreamPlayer = get_node_or_null("HeartbeatPlayer")
+@onready var footstep_player: AudioStreamPlayer  = get_node_or_null("FootstepPlayer")
+@onready var mrak_body: Node2D = get_node_or_null("MrakBody")
 
 # ─────────────────────────────────────────────
 # STATE
@@ -115,7 +115,7 @@ func _apply_gravity(delta: float) -> void:
 	elif is_on_floor() and not is_on_ladder:
 		velocity.y = 0.0
 
-func _handle_movement(delta: float) -> void:
+func _handle_movement(_delta: float) -> void:
 	var dir: float = Input.get_axis("move_left", "move_right")
 
 	if is_on_ladder:
