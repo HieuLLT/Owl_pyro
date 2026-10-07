@@ -136,8 +136,9 @@ func _process(delta: float) -> void:
 		return
 
 	# standing_still_5s
-	var mrak := get_tree().get_first_node_in_group("mrak") as CharacterBody2D
-	if mrak and mrak.velocity.length() < 1.0 and not GameManager.is_blind:
+	# Works for both the 2D (CharacterBody2D) and first-person (CharacterBody3D) player.
+	var mrak: Node = get_tree().get_first_node_in_group("mrak")
+	if mrak and "velocity" in mrak and mrak.velocity.length() < 1.0 and not GameManager.is_blind:
 		_still_time += delta
 		if _still_time >= STILL_SECONDS:
 			_still_time = 0.0

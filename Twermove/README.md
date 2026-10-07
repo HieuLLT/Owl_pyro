@@ -1,3 +1,6 @@
+
+> **Bản First-Person (Godot 3D):** `PheТichYThuc/scenes/fp/FP_TestRoom.tscn` (F6). Xem `PheТichYThuc/docs/FP_CONVERSION_REPORT.md`. Nhân vật мрак **không có chân** — xem `docs/MRAK_FIRST_APPEARANCE.md`.
+
 > **Trạng thái dự án (10/2026):** engine chính của game là **Godot 4** trong thư mục [`PheТichYThuc/`](PheТichYThuc/README.md) ("Phế Tích Ý Thức").
 > `titan_frontend/` + `titan_backend/` chỉ còn là menu web và bản demo hệ thống thoại (`play.html`).
 > Phần "Spatial Cross-Section Engine" bên dưới là prototype cũ, không còn phát triển.

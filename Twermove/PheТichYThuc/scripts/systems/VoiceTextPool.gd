@@ -117,7 +117,7 @@ func clear_red(fade: float = 0.12) -> void:
 	for label in _active.duplicate():
 		if label.has_meta("voice") and label.get_meta("voice") == Voice.RED:
 			_kill_tweens(label)
-			var t := label.create_tween()
+			var t: Tween = label.create_tween()
 			_tweens[label] = [t]
 			t.tween_property(label, "modulate:a", 0.0, fade)
 			t.tween_callback(_release.bind(label))

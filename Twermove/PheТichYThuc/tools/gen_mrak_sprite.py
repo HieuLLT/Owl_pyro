@@ -13,6 +13,8 @@ Output (relative to the project root):
     assets/sprites/mrak/mrak_frames.tres   SpriteFrames (res:// paths)
     assets/sprites/mrak/_contact_sheet.png preview (not used by the game)
 
+Design (from the lore) — LEGLESS: мрак was built to crawl, so there are no legs or
+  leg-like robot parts; the waist ends in a torn stump with trailing cables.
 Design (from the lore):
   * ~70% necrotic grey flesh over a tarnished-metal skeleton
   * broken open chest: rib cage + a rusty mechanical heart with a cyan core
@@ -52,7 +54,6 @@ PAL = {
 C = PAL
 
 ARM = (13, 15)   # over-long arms
-LEG = (12, 13)
 
 # animation name -> (frame count, fps, loop)
 ANIMS = {
@@ -121,45 +122,66 @@ def limb(d, root, target, lens, bend, w_up, w_lo, far=False, hand=True):
     return joint, end
 
 
+def draw_stump(d, hip, u, hang, rng):
+    """Ragged torn waist: exposed tarnished spine end, rusty teeth, cables trailing behind."""
+    hx, hy = ipt(hip)
+    bx, by = -u[0], -u[1]  # direction pointing away from the torso
+    # torn rim (jagged flesh teeth)
+    for k in (-4, -2, 0, 2, 4):
+        ex = hx + round(bx * 2) + (1 if k % 4 == 0 else 0)
+        ey = hy + k + round(by * 2)
+        d.point((ex, ey), fill=C["flesh_d"])
+    d.line([(hx + round(bx * 3), hy - 1), (hx + round(bx * 3), hy + 1)], fill=C["tarn"], width=1)
+    d.point((hx + round(bx * 3), hy), fill=C["rust"])
+    # cables
+    for k in range(3):
+        sx, sy = hx + round(bx * 3), hy - 2 + k * 2
+        if hang:
+            ex, ey = sx + (k - 1) * 2 + rng.randint(-1, 1), min(62, sy + 9 + 3 * k)
+        else:
+            ex, ey = sx + round(bx * (7 + 3 * k)) - 3 - k, min(62, sy + 4 + k * 2)
+        col = (C["root"], C["rust_d"], C["cyan_d"])[k]
+        mx, my = (sx + ex) // 2, (sy + ey) // 2 + (1 if not hang else 0)
+        d.line([(sx, sy), (mx, my), (ex, ey)], fill=col, width=1)
+        if k == 2:
+            d.point((ex, ey), fill=C["cyan"])
+
+
 # ── per-frame poses ─────────────────────────────────────────────────────────
 def pose(anim, i):
-    P = dict(drip=0, fan=0.0, glitch_seed=i)
+    """Legless crawler: the torso ends in a torn stump (hip) that drags behind;
+    all locomotion comes from the two over-long arms. `hang` = stump cables dangle."""
+    P = dict(drip=0, fan=0.0, glitch_seed=i, hang=False)
     if anim == "idle":
         b = i
-        P.update(hip=(27, 40), sh=(35, 27 - b), head=(39, 15 - b),
-                 na=(41, 52 + b), fa=(32, 50 + b), nl=(31, GROUND), fl=(22, GROUND), drip=i * 2)
+        P.update(hip=(12, 56), sh=(28, 35 - b), head=(35, 22 - b),
+                 na=(40, GROUND), fa=(33, GROUND), drip=i * 2)
     elif anim == "crawl":
         ph = i / 4.0 * 2.0 * math.pi
         sw, cs = math.sin(ph), math.cos(ph)
         bob = abs(sw)
-        P.update(hip=(24, 42 + bob), sh=(37, 33 + bob), head=(45, 22 + bob),
-                 na=(46 + 7 * sw, GROUND - 6 * max(0, cs)),
-                 fa=(46 - 7 * sw, GROUND - 6 * max(0, -cs)),
-                 nl=(22 - 6 * sw, GROUND - 5 * max(0, -cs)),
-                 fl=(22 + 6 * sw, GROUND - 5 * max(0, cs)), drip=i)
+        P.update(hip=(11 - 2 * sw, 56), sh=(27, 36 + bob), head=(35, 25 + bob),
+                 na=(38 + 7 * sw, GROUND - 6 * max(0, cs)),
+                 fa=(38 - 7 * sw, GROUND - 6 * max(0, -cs)), drip=i)
     elif anim == "crouch_idle":
-        P.update(hip=(19, 51), sh=(33, 48), head=(43, 47),
-                 na=(42, GROUND), fa=(36, GROUND), nl=(24, GROUND), fl=(15, GROUND), drip=1)
+        P.update(hip=(10, 57), sh=(26, 47), head=(36, 45),
+                 na=(38, GROUND), fa=(32, GROUND), drip=1)
     elif anim == "crawl_low":
         ph = i / 4.0 * 2.0 * math.pi
         sw, cs = math.sin(ph), math.cos(ph)
         bob = abs(sw) * 0.8
-        P.update(hip=(19, 51 + bob), sh=(33, 48 + bob), head=(43, 47 + bob),
-                 na=(43 + 5 * sw, GROUND - 4 * max(0, cs)),
-                 fa=(43 - 5 * sw, GROUND - 4 * max(0, -cs)),
-                 nl=(23 - 4 * sw, GROUND - 4 * max(0, -cs)),
-                 fl=(17 + 4 * sw, GROUND - 4 * max(0, cs)), drip=i)
+        P.update(hip=(10 - 1.5 * sw, 57), sh=(26, 47 + bob), head=(36, 45 + bob),
+                 na=(40 + 5 * sw, GROUND - 4 * max(0, cs)),
+                 fa=(40 - 5 * sw, GROUND - 4 * max(0, -cs)), drip=i)
     elif anim == "fall":
-        P.update(hip=(30, 38), sh=(34, 25), head=(36, 13),
-                 na=(44, 8 + 2 * i), fa=(25, 12 - 2 * i),
-                 nl=(26, 60 - 2 * i), fl=(35, 57 - 2 * i), drip=3 + i * 3)
+        P.update(hip=(27, 46), sh=(32, 31), head=(35, 19), hang=True,
+                 na=(44, 10 + 2 * i), fa=(24, 12 - 2 * i), drip=3 + i * 3)
     elif anim == "climb":
+        P.update(hip=(30, 49), sh=(32, 33), head=(34, 21), hang=True, drip=1)
         if i == 0:
-            P.update(hip=(28, 44), sh=(32, 29), head=(34, 18),
-                     na=(37, 14), fa=(33, 24), nl=(30, 54), fl=(27, GROUND), drip=1)
+            P.update(na=(37, 16), fa=(33, 26))
         else:
-            P.update(hip=(28, 44), sh=(32, 29), head=(34, 18),
-                     na=(36, 23), fa=(34, 13), nl=(30, 59), fl=(28, 52), drip=2)
+            P.update(na=(36, 25), fa=(34, 15))
     P["fan"] = i * 0.9
     return P
 
@@ -179,7 +201,6 @@ def render(anim, i):
 
     # far limbs (darker, behind the body)
     limb(d, sh, P["fa"], ARM, +1, 4, 3, far=True)
-    limb(d, hip, P["fl"], LEG, -1, 5, 4, far=True, hand=False)
 
     # torso
     def off(p, k):
@@ -215,8 +236,8 @@ def render(anim, i):
         d.point((dx0, min(dy0 + k, 62)), fill=C["cyan_d"])
     d.point((dx0, min(dy0 + 3 + drip, 62)), fill=C["cyan"])
 
-    # near leg
-    limb(d, hip, P["nl"], LEG, -1, 5, 4, hand=False)
+    # torn stump + trailing cables instead of legs
+    draw_stump(d, hip, (ux, uy), P["hang"], rng)
 
     # neck + radiator fan in the throat
     neck = (sh[0] + (head[0] - sh[0]) * 0.45, sh[1] + (head[1] - sh[1]) * 0.45)
