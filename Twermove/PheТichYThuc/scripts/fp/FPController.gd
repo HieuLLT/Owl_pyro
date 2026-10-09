@@ -5,13 +5,13 @@
 # the mechanical heart (60 -> 110 BPM as necrosis rises).
 #
 #   Mouse         look            W/A/S/D     drag in that direction
-#   Space         close eyes (Sensory Deprivation)  — pitch black, only sound remains
+#   Space (HOLD)  close eyes (Sensory Deprivation)  — pitch black, only sound remains
 #   Q             Vestige Needle (compass arm)      Esc  release mouse
 class_name FPController
 extends CharacterBody3D
 
 const MAX_SPEED: float = 2.2          # m/s at the peak of a pull
-const DRAG_HZ: float = 0.9            # pulls per second at 0% necrosis
+const DRAG_HZ: float = 0.5            # full arm cycles per second (2 pulls: left, right)
 const MOUSE_SENS: float = 0.0022
 const EYE_HEIGHT: float = 0.55        # metres: a crawler's eye level
 const BASE_FOV: float = 78.0
@@ -31,6 +31,7 @@ var _beat_kick: float = 0.0
 var _last_radius: float = -1.0
 var _needle_on: bool = false
 var _dead: bool = false
+var _moving_now: bool = false
 
 var compass_arm: CompassArm
 var _drag_player: AudioStreamPlayer3D
@@ -70,8 +71,6 @@ func _input(event: InputEvent) -> void:
 		rotate_y(-m.relative.x * MOUSE_SENS)
 		_pitch = clampf(_pitch - m.relative.y * MOUSE_SENS, deg_to_rad(-60.0), deg_to_rad(65.0))
 		head.rotation.x = _pitch
-	elif event.is_action_pressed("blink"):
-		_toggle_blind()
 	elif event.is_action_pressed("vestige_needle"):
 		_needle_on = not _needle_on
 		EventBus.vestige_needle_toggled.emit(_needle_on)
@@ -84,17 +83,18 @@ func _physics_process(delta: float) -> void:
 	var nec: float = GameManager.necrosis / 100.0
 	var in_dir: Vector2 = Input.get_vector("fp_left", "fp_right", "fp_forward", "fp_back")
 	var moving: bool = in_dir.length() > 0.1
+	_moving_now = moving
 
 	var target_speed: float = 0.0
 	if moving:
 		# Heavy, uneven drag: surge on each pull, stall in between
 		_drag_phase += delta * TAU * DRAG_HZ * (1.0 - 0.35 * nec)
 		var s: float = sin(_drag_phase)
-		_pulse = pow(maxf(s, 0.0), 1.4)
+		_pulse = pow(absf(s), 1.4)
 		target_speed = MAX_SPEED * (1.0 - 0.55 * nec) * _pulse
 		if is_blind:
 			target_speed *= 0.6
-		if _prev_sin <= 0.0 and s > 0.0:
+		if (_prev_sin <= 0.0 and s > 0.0) or (_prev_sin >= 0.0 and s < 0.0):
 			_on_drag_pull()
 		_prev_sin = s
 	else:
@@ -116,10 +116,15 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	_update_sound_radius(moving)
+	if global_position.y < -6.0:
+		# Fell into the abyss of The Erasure
+		EventBus.memory_leak_speak.emit("Không có đáy. Chỉ có tiếng nhiễu.", 1.0)
+		GameManager.add_necrosis(100.0)
 
 func _process(delta: float) -> void:
 	if _dead:
 		return
+	_update_blind_input()
 	_update_heartbeat(delta)
 	# Camera: lurch with the drag, rock side to side, kick on the heartbeat
 	head.position.y = EYE_HEIGHT - 0.05 * _pulse - 0.015 * _beat_kick
@@ -128,7 +133,7 @@ func _process(delta: float) -> void:
 	camera.fov = BASE_FOV + 2.0 * _beat_kick
 	if compass_arm:
 		compass_arm.beat = _beat_kick
-		compass_arm.set_drag(_pulse, _drag_phase)
+		compass_arm.set_drag(_pulse, _drag_phase, _moving_now)
 
 func _update_heartbeat(delta: float) -> void:
 	var nec: float = GameManager.necrosis / 100.0
@@ -160,13 +165,19 @@ func _update_sound_radius(moving: bool) -> void:
 		_last_radius = r
 		GameManager.set_sound_radius(r)
 
-func _toggle_blind() -> void:
-	if not is_blind and GameManager.pin < 5.0:
-		EventBus.firewall_speak.emit("WARNING — INSUFFICIENT POWER FOR SENSORY DEPRIVATION.")
-		return
-	var b: bool = not is_blind
-	GameManager.is_blind = b
-	EventBus.mrak_blink_toggled.emit(b)
+## Story: "giữ phím Spacebar" — the eyes stay closed only while Space is HELD.
+func _update_blind_input() -> void:
+	var held: bool = Input.is_action_pressed("blink")
+	if held and not is_blind:
+		if GameManager.pin < 5.0:
+			if Input.is_action_just_pressed("blink"):
+				EventBus.firewall_speak.emit("WARNING — INSUFFICIENT POWER FOR SENSORY DEPRIVATION.")
+			return
+		GameManager.is_blind = true
+		EventBus.mrak_blink_toggled.emit(true)
+	elif not held and is_blind:
+		GameManager.is_blind = false
+		EventBus.mrak_blink_toggled.emit(false)
 
 func _on_blink_changed(blind: bool) -> void:
 	is_blind = blind

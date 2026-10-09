@@ -38,3 +38,23 @@ Phaser.js không dùng trong bản này. Web frontend chỉ giữ làm menu/demo
 - Màn thử chỉ có một hành lang; chưa có zero-g, chưa nối Hồi 1.
 - Cánh tay la bàn chỉ là hình khối cơ bản; có thể thay bằng mô hình sau.
 - Âm thanh chưa qua bus riêng; chưa có hồi quy cho GPU thật.
+
+---
+
+## 8. Đợt chỉnh sửa 09/10 (theo rà soát cốt truyện)
+
+**Logic hai giọng nói (đối chiếu `SRC/cot-truyen...` và `GDD.md`):**
+| Giọng | Theo cốt truyện | Trước | Nay |
+|---|---|---|---|
+| Trắng/xanh nhạt | chữ nhạt trên **da thịt hoặc mặt đất**, dẫn đường | khắc lên tường | dòng ngắn (≤38 ký tự) viết trên **cẳng tay**; dòng dài nằm trên **mặt đất** phía trước. Tường chỉ dành cho **hướng dẫn** (`PsychText3D.instruct`) |
+| Đỏ/đen glitch | **che khuất tầm nhìn** (tới ~80% màn hình khi Phantom gào) | khắc lên tường | dán lên **màn hình** (`FPOverlay`, viền đen, to dần theo cường độ, 1–10 dòng); xóa ngay khi nhắm mắt |
+| Nhắm mắt | **giữ** Space | bấm bật/tắt | giữ Space (chỉ bản FP; bản 2D vẫn bật/tắt, cần đồng bộ sau) |
+| La bàn | 70% đúng hướng, 30% nhiễu dẫn vào ổ quái (GDD) | chỉ nhiễu theo necrosis | 70% chỉ mảnh ký ức, 30% chỉ lỗ đen Erasure, đổi mỗi 4–8 giây; nhắm mắt thì tắt đèn sinh học |
+
+**Tầm nhìn kính lặn vỡ/đen:** `shaders/fp/fp_visor.gdshader` — viền đen không đều nuốt các góc, vết nứt tỏa từ hai điểm va chạm (hình ảnh bị lệch dọc vết nứt), mảnh kính rụng thành đen, hơi nước thở; độ hư hại tăng theo necrosis.
+
+**Khối tay làm lại (`CompassArm.gd`):** hai tay dài lồi lõm sinh bằng mesh thủ tục, vết thương lõm lộ xương kim loại, vuốt cào sàn, hai vòng gông rỉ; tay trái cắm la bàn rỉ vẹo, rễ kim loại đen xuyên da (ánh xanh/đỏ). Hai tay **kéo luân phiên** theo nhịp lết (khớp mô tả мрак không chân).
+
+**Thế giới dựng lại (`RuinGen.gd`, `FPTestLevel.gd`):** "Bãi Phế Liệu Ký Ức" — mặt đất chia mảng nghiêng có rãnh đứt gãy, mép ragged, vách đá treo; tường nghiêng có chỗ sập và đỉnh lởm chởm; cột gãy lòi cốt thép; tấm trần vỡ treo cáp, đèn neon treo xiên; đống đổ nát; vũng coolant hình bất định; ba lỗ đen Erasure (cái gần nhất mới "ăn" hình học); cuối đường là vách cụt nhìn ra các đảo bê tông lơ lửng trôi chậm trên vực thẳm nhiễu hạt (Hồi 2). Đường lết quanh co, đã kiểm tra bằng bot đi hết lộ trình (không rơi, không kẹt). Rơi xuống vực = bị xóa.
+
+**Chưa làm:** bản 2D chưa đổi sang giữ-Space; chưa có hệ nhảy cho Hồi 2; mô hình tay/đảo vẫn là hình thủ tục, có thể thay bằng asset.

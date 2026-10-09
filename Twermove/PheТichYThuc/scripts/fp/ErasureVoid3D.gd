@@ -23,6 +23,7 @@ var _killed: bool = false
 var _mesh: MeshInstance3D
 
 func _ready() -> void:
+	add_to_group("lair")   # the compass lies and points here ~30% of the time
 	var sphere := SphereMesh.new()
 	sphere.radius = 1.0
 	sphere.height = 2.0
