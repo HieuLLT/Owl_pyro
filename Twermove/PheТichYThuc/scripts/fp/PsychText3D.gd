@@ -36,6 +36,7 @@ func setup(camera: Camera3D) -> void:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.width = 760.0
+		l.font = FPFonts.mono()                  # Firewall = terminal monospace
 		l.set_meta("t0", 0.0)
 		add_child(l)
 		_pool.append(l)
@@ -44,6 +45,10 @@ func setup(camera: Camera3D) -> void:
 func _on_firewall(msg: String) -> void:
 	if GameManager.is_blind:
 		return                                   # nothing is visible with the eyes closed
+	# chaos > 0.7: the Red voice eats the Firewall's lines (Zalgo corruption, report §4.3)
+	var chaos: float = GameManager.necrosis / 100.0
+	if chaos > 0.7:
+		msg = FPFonts.corrupt(msg, (chaos - 0.7) * 0.9)
 	var arm := _camera.get_node_or_null("CompassArm") as CompassArm
 	if arm and msg.length() <= SKIN_MAX:
 		arm.show_skin_text(msg)
@@ -61,8 +66,23 @@ func instruct(msg: String) -> void:
 func _place(msg: String, ground: bool) -> void:
 	if _camera == null or msg.is_empty():
 		return
+	if ground:                                   # never more than two lines on the floor at once
+		var shown: Array[Label3D] = []
+		for l in _pool:
+			if l.visible and l.has_meta("ground"):
+				shown.append(l)
+		if shown.size() >= 2:
+			var old: Label3D = shown[0]
+			for l in shown:
+				if (l.get_meta("t0") as float) < (old.get_meta("t0") as float):
+					old = l
+			_release(old)
 	var label := _acquire()
 	label.text = msg
+	if ground:
+		label.set_meta("ground", true)
+	elif label.has_meta("ground"):
+		label.remove_meta("ground")
 	label.set_meta("t0", Time.get_ticks_msec() / 1000.0)
 	label.modulate = Color(WHITE_COLOR.r, WHITE_COLOR.g, WHITE_COLOR.b, 0.0)
 
@@ -92,7 +112,7 @@ func _place(msg: String, ground: bool) -> void:
 		drift.tween_property(label, "global_position:y", label.global_position.y + 0.25, 8.0)
 		label.set_meta("drift", drift)
 
-	label.pixel_size = 0.0024 * clampf(dist / 3.0, 0.7, 1.8)
+	label.pixel_size = 0.0017 * clampf(dist / 3.0, 0.7, 1.8)
 	label.visible = true
 
 	var hold: float = 5.0 + msg.length() * 0.05

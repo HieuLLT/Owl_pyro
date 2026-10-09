@@ -2,7 +2,7 @@
 
 Lựa chọn đã xác nhận: **Godot 3D** là bản chính; làm Phase 1 (controller, shader, chữ tâm lý 3D, màn thử) và Phase 2 bằng **Python thủ tục, không cần API**. Nhân vật theo `MRAK_FIRST_APPEARANCE.md`: **không chân**.
 
-Chạy thử: mở project bằng Godot 4.4+ → mở `scenes/fp/FP_TestRoom.tscn` → F6. Bản 2D (`Floor_0.tscn`) vẫn là main scene và không bị ảnh hưởng.
+Chạy thử: mở project bằng Godot 4.4+ (đã dùng thật 4.7.2 ở phía bạn) → F5. Từ đợt 10/10 `run/main_scene` là `scenes/fp/FP_TestRoom.tscn`; bản 2D (`Floor_0.tscn`) không còn là cảnh chạy (file giữ lại, chưa xóa).
 
 ## 1. Đã kiểm chứng ra sao
 Đã tải Godot 4.4.1 và chạy thật: nạp được mọi script/scene/shader (0 lỗi), chạy headless cả màn 3D lẫn `Floor_0` 1500 khung không lỗi runtime, và render bằng GL mềm để chụp ảnh (`docs/fp_preview/`). Đợt kiểm tra này cũng bắt được một lỗi cú pháp cũ trong `VoiceTextPool.gd` (đã sửa). Chưa thử trên GPU thật và chưa chơi bằng bàn phím/chuột; cảm giác điều khiển cần bạn thử.
@@ -58,3 +58,25 @@ Phaser.js không dùng trong bản này. Web frontend chỉ giữ làm menu/demo
 **Thế giới dựng lại (`RuinGen.gd`, `FPTestLevel.gd`):** "Bãi Phế Liệu Ký Ức" — mặt đất chia mảng nghiêng có rãnh đứt gãy, mép ragged, vách đá treo; tường nghiêng có chỗ sập và đỉnh lởm chởm; cột gãy lòi cốt thép; tấm trần vỡ treo cáp, đèn neon treo xiên; đống đổ nát; vũng coolant hình bất định; ba lỗ đen Erasure (cái gần nhất mới "ăn" hình học); cuối đường là vách cụt nhìn ra các đảo bê tông lơ lửng trôi chậm trên vực thẳm nhiễu hạt (Hồi 2). Đường lết quanh co, đã kiểm tra bằng bot đi hết lộ trình (không rơi, không kẹt). Rơi xuống vực = bị xóa.
 
 **Chưa làm:** bản 2D chưa đổi sang giữ-Space; chưa có hệ nhảy cho Hồi 2; mô hình tay/đảo vẫn là hình thủ tục, có thể thay bằng asset.
+
+---
+
+## 9. Đợt chỉnh sửa 10/10 (font, tối hơn, tay mới)
+
+**Font (báo cáo `dialogue_voice_and_floating_typography_report.md`):** 6 font từ `SRC/` được chép vào `assets/fonts/` và nạp bằng `scripts/fp/FPFonts.gd` (bật MSDF). Đã kiểm tra các font có đủ dấu tiếng Việt.
+| Giọng / trạng thái | Font |
+|---|---|
+| Firewall (trắng) | monospace hệ thống (Share Tech Mono / Space Mono / Consolas), bị chèn ký tự Zalgo khi necrosis > 70% |
+| Đỏ — bình thường | MTOGrungeSans (đỏ rượu trầm) |
+| Đỏ — nhắm mắt | SkippySharpi, chỉ còn một dòng mờ phát sáng trên nền đen (không còn che hình) |
+| Đỏ — quá nhiệt (thermal > 70) | HundredWatt + chớp tắt liên tục |
+| Đỏ — dồn dập (cường độ > 0.6 / necrosis > 70%) | MTOGettingAngry |
+| Đỏ — cuồng loạn (> 0.85) | KillCrazy |
+| Quái vật / Phantom | MTOMonsterTalking (`FPFonts.pick_emotion(..., monster=true)`) |
+Chữ Trắng trên mặt đất tối đa 2 dòng cùng lúc và nhỏ hơn để không che tay.
+
+**Tối hơn / tầm nhìn hẹp:** ambient ~3 lần tối hơn, đèn lạnh 0.28 → 0.05, sương 0.03 → 0.065 (tông filmic, exposure 0.9), neon/đèn coolant/mảnh ký ức yếu hơn. Kính vỡ thu vòng đen vào (rim 0.45, elip dẹt), thêm lớp bồ hóng làm tối dần ra mép.
+
+**Tay làm lại:** cẳng tay gầy cong, hai xương lộ ở vết thương, bàn tay năm ngón chạm sàn; la bàn đeo trên cẳng tay trái bằng hai đai gỉ; rễ kim loại đen mảnh bò sát da thay vì mọc như cành cây. Tay vẫn kéo luân phiên theo nhịp lết.
+
+Kiểm tra: 0 lỗi nạp, bot đi hết lộ trình, ảnh trong `docs/fp_preview/`. Chưa thử trên GPU thật.

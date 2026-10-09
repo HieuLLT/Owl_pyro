@@ -67,7 +67,7 @@ func _make_label() -> RichTextLabel:
 
 ## Show text at a position in the host's local space (screen space under a CanvasLayer).
 ## intensity: 0.0 whisper … 1.0 screaming (affects size, shake, tornado).
-func show_text(text: String, voice: Voice, pos: Vector2, intensity: float = 0.5, lifetime: float = -1.0) -> RichTextLabel:
+func show_text(text: String, voice: Voice, pos: Vector2, intensity: float = 0.5, lifetime: float = -1.0, emotion: String = "") -> RichTextLabel:
 	if _host == null:
 		push_warning("[VoiceTextPool] setup() was not called.")
 		return null
@@ -75,11 +75,21 @@ func show_text(text: String, voice: Voice, pos: Vector2, intensity: float = 0.5,
 	var label := _acquire()
 	var life: float = lifetime if lifetime > 0.0 else (RED_LIFETIME if voice == Voice.RED else WHITE_LIFETIME) * (1.0 + intensity * 0.4)
 
-	label.text = _build_bbcode(text, voice, intensity)
+	# Optional emotion font (FPFonts): swaps the face and colour of the red voice
+	var col_hex: String = RED_COLOR
+	if emotion != "":
+		var ef: Font = FPFonts.get_font(emotion)
+		if ef:
+			label.add_theme_font_override("normal_font", ef)
+		col_hex = "#" + FPFonts.color_of(emotion).to_html(false)
+	elif _font:
+		label.add_theme_font_override("normal_font", _font)
+	label.text = _build_bbcode(text, voice, intensity, col_hex)
 	label.add_theme_font_size_override("normal_font_size", _font_size(voice, intensity))
 	label.position = _clamp_to_screen(pos)
 	label.rotation = deg_to_rad(randf_range(-4.0, 4.0)) if voice == Voice.RED else 0.0
 	label.modulate.a = 0.0
+	label.self_modulate = Color.WHITE
 	label.visible = true
 	label.set_meta("voice", voice)
 
@@ -159,7 +169,7 @@ func _kill_tweens(label: RichTextLabel) -> void:
 				t.kill()
 		_tweens.erase(label)
 
-func _build_bbcode(text: String, voice: Voice, intensity: float) -> String:
+func _build_bbcode(text: String, voice: Voice, intensity: float, red_hex: String = RED_COLOR) -> String:
 	# Escape user text so stray "[" cannot inject or break tags
 	var safe: String = text.replace("[", "[lb]")
 	match voice:
@@ -167,7 +177,7 @@ func _build_bbcode(text: String, voice: Voice, intensity: float) -> String:
 			return "[wave amp=%d freq=%.1f connected=0][color=%s]%s[/color][/wave]" % [
 				int(lerpf(6.0, 14.0, intensity)), lerpf(1.5, 3.0, intensity), WHITE_COLOR, safe]
 		_:
-			var inner: String = "[color=%s]%s[/color]" % [RED_COLOR, safe]
+			var inner: String = "[color=%s]%s[/color]" % [red_hex, safe]
 			var s: String = "[shake rate=%d level=%d connected=0]%s[/shake]" % [
 				int(lerpf(12.0, 30.0, intensity)), int(lerpf(3.0, 12.0, intensity)), inner]
 			if intensity > 0.75:

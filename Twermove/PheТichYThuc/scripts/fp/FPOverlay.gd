@@ -17,6 +17,8 @@ var _black: ColorRect
 var _death: Label
 var _red_host: Control
 var _red_pool: VoiceTextPool
+var _mem_host: Control
+var _mem_pool: VoiceTextPool
 var _dead: bool = false
 var _t: float = 0.0
 var _intrusion_tween: Tween
@@ -46,6 +48,15 @@ func _ready() -> void:
 	_black.color = Color(0.0, 0.0, 0.0, 1.0)
 	_black.modulate.a = 0.0
 	add_child(_black)
+
+	# Eyes closed: only a faint childlike marker-pen memory (SkippySharpi) glows on the black (report §3.2.2)
+	_mem_host = Control.new()
+	_mem_host.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mem_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_mem_host)
+	_mem_pool = VoiceTextPool.new()
+	add_child(_mem_pool)
+	_mem_pool.setup(_mem_host, null)
 
 	_death = Label.new()
 	_death.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -89,7 +100,13 @@ func _set_intrusion(v: float) -> void:
 	_noise_mat.set_shader_parameter("intrusion", v)
 
 func _on_leak(msg: String, intensity: float) -> void:
-	if GameManager.is_blind or _dead:
+	if _dead:
+		return
+	if GameManager.is_blind:
+		var sz: Vector2 = get_viewport().get_visible_rect().size
+		var lb: RichTextLabel = _mem_pool.show_text(msg, VoiceTextPool.Voice.RED, Vector2(randf_range(0.15, 0.5) * sz.x, randf_range(0.3, 0.65) * sz.y), 0.25, 3.0, "despair")
+		if lb:
+			lb.modulate.a = 0.0
 		return
 	intrude(0.4 + 0.5 * intensity, 0.45)
 	_flood_red(msg, intensity)
@@ -108,16 +125,23 @@ func _flood_red(msg: String, intensity: float) -> void:
 			text = " ".join(words.slice(a, b))
 		var pos := Vector2(randf_range(0.0, 0.62) * size.x, randf_range(0.04, 0.78) * size.y)
 		var inten: float = clampf(intensity + randf_range(-0.15, 0.15), 0.0, 1.0)
-		var label: RichTextLabel = _red_pool.show_text(text, VoiceTextPool.Voice.RED, pos, inten, 2.2 + intensity * 1.8)
+		var emo: String = FPFonts.pick_emotion(inten, GameManager.necrosis / 100.0, GameManager.thermal, GameManager.is_blind)
+		var label: RichTextLabel = _red_pool.show_text(text, VoiceTextPool.Voice.RED, pos, inten, 2.2 + intensity * 1.8, emo)
 		if label:
 			# Red on black: a thick dark outline, scaled up with the voice's volume
 			label.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0, 1.0))
 			label.add_theme_constant_override("outline_size", 6 + roundi(intensity * 8.0))
-			label.scale = Vector2.ONE * (1.0 + intensity * 1.2)
+			label.scale = Vector2.ONE * (1.45 + intensity * 1.2)
+			if emo == "envy":                       # overheat: constant flicker (report 3.2)
+				var fl := label.create_tween().set_loops(30)
+				fl.tween_property(label, "self_modulate:a", 0.25, 0.06)
+				fl.tween_property(label, "self_modulate:a", 1.0, 0.06)
 
 func _on_blink(blind: bool) -> void:
 	if blind:
 		_red_pool.clear_red(0.05)
+	else:
+		_mem_pool.clear_all()
 	if _dead:
 		return
 	var tw := create_tween()

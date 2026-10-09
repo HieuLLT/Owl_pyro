@@ -13,7 +13,7 @@ shader_type canvas_item;
 uniform sampler2D screen_tex : hint_screen_texture, repeat_disable, filter_linear;
 
 uniform float damage : hint_range(0.0, 1.0) = 0.2;
-uniform float rim_start : hint_range(0.2, 0.9) = 0.50;
+uniform float rim_start : hint_range(0.2, 0.9) = 0.45;
 uniform float rim_softness : hint_range(0.02, 0.5) = 0.18;
 uniform vec2 impact_a = vec2(0.84, 0.20);
 uniform vec2 impact_b = vec2(0.14, 0.80);
@@ -79,7 +79,7 @@ void fragment() {
 
 	// Wobbly black rim
 	float wob = (vnoise(uv * 3.5 + 7.0) - 0.5) * 0.30 + (vnoise(uv * 11.0) - 0.5) * 0.07;
-	float d = length(c * vec2(0.62, 1.0)) + wob;
+	float d = length(c * vec2(0.62, 0.80)) + wob;
 	float rim = smoothstep(rim_start - damage * 0.12, rim_start - damage * 0.12 + rim_softness, d);
 
 	// Cracks
@@ -101,6 +101,10 @@ void fragment() {
 	// Cracks catch the red light
 	col += vec3(0.75, 0.82, 0.9) * crack * 0.55;
 	col *= 1.0 - crack * 0.15;
+
+	// Soot: the view darkens steadily towards the edges, the whole glass is dim
+	col *= 1.0 - smoothstep(0.12, 0.52, d) * (0.40 + 0.3 * damage);
+	col *= 0.82;
 
 	// Missing shards, then the black rim
 	col = mix(col, vec3(0.0), shard_gone);

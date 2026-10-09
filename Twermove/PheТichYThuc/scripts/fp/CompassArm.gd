@@ -94,61 +94,84 @@ func _build_arm(is_left: bool) -> Node3D:
 	var seed_base: int = 660 if is_left else 770
 	var mat: ShaderMaterial = _mat_l if is_left else _mat_r
 
-	# Spine of the arm: shoulder -> elbow knob -> sunken forearm -> wrist -> palm (extends along -Z)
+	# Readable arm: forearm reaching forward, wrist bent, hand flat on the floor.
+	# (upper arm stays below the screen edge). Starved, lean, slightly crooked.
 	var ctrl: Array = [
 		Vector3(0.0, 0.0, 0.0),
-		Vector3(-sgn * 0.01, 0.025, -0.26),
-		Vector3(-sgn * 0.03, 0.045, -0.50),    # elbow knob, raised
-		Vector3(-sgn * 0.02, -0.07, -0.76),
-		Vector3(0.0, -0.22, -0.96),
-		Vector3(sgn * 0.01, -0.305, -1.06),    # palm planted on the floor (eye is 0.55 m up)
+		Vector3(-sgn * 0.01, 0.03, -0.20),       # elbow, lifted
+		Vector3(-sgn * 0.02, 0.01, -0.42),
+		Vector3(-sgn * 0.01, -0.10, -0.64),      # forearm descending
+		Vector3(0.0, -0.215, -0.80),             # wrist
+		Vector3(sgn * 0.005, -0.285, -0.90),     # back of the hand, resting
 	]
-	var pts: PackedVector3Array = RuinGen.spline(ctrl, 28)
+	var pts: PackedVector3Array = RuinGen.spline(ctrl, 30)
 	var n: int = pts.size()
 	var radii := PackedFloat32Array()
 	for i in n:
 		var t: float = float(i) / float(n - 1)
-		var r: float = lerpf(0.075, 0.034, t)
-		r *= 1.0 + 0.35 * exp(-pow((t - 0.45) / 0.07, 2.0))     # elbow knob
-		r *= 1.0 - 0.45 * exp(-pow((t - 0.66) / 0.08, 2.0))     # sunken wound
+		var r: float = lerpf(0.062, 0.027, pow(t, 0.8))
+		r *= 1.0 + 0.18 * exp(-pow((t - 0.12) / 0.07, 2.0))      # elbow bone
+		r *= 1.0 - 0.28 * exp(-pow((t - 0.60) / 0.07, 2.0))      # starved forearm, one gash
+		r *= 1.0 + 0.22 * exp(-pow((t - 0.86) / 0.05, 2.0))      # wrist knob
 		radii.append(r)
-	_mesh(arm, RuinGen.tube_mesh(pts, radii, 10, 0.16, seed_base, true, true), mat)
+	_mesh(arm, RuinGen.tube_mesh(pts, radii, 12, 0.06, seed_base, true, true), mat)
 
-	# Exposed bone running through the wound and out past the wrist
-	var bone_pts := PackedVector3Array()
-	for i in range(int(n * 0.50), int(n * 0.93)):
-		bone_pts.append(pts[i] + Vector3(0.0, 0.004, 0.0))
-	var bone_r := PackedFloat32Array([0.013, 0.012, 0.011, 0.009])
-	var bone_mat: StandardMaterial3D = _metal(Color(0.85, 0.75, 0.55))
-	_mesh(arm, RuinGen.tube_mesh(bone_pts, bone_r, 6, 0.1, seed_base + 1, true, true), bone_mat)
+	# Two parallel bones show through the gash (radius/ulna)
+	var bone_mat: StandardMaterial3D = _metal(Color(0.70, 0.62, 0.48))
+	for side in 2:
+		var bp := PackedVector3Array()
+		for i in range(int(n * 0.50), int(n * 0.80)):
+			bp.append(pts[i] + Vector3((float(side) - 0.5) * 0.016, radii[i] * 0.78, 0.0))
+		_mesh(arm, RuinGen.tube_mesh(bp, PackedFloat32Array([0.007, 0.0065, 0.006, 0.005]), 5, 0.05, seed_base + 1 + side, true, true), bone_mat)
 
-	# Claws: long, uneven, scraping the floor
+	# Hand: a flat palm, four long jointed fingers and a thumb, tips dug into the floor
 	var palm: Vector3 = pts[n - 1]
-	var claw_mat: StandardMaterial3D = _metal(Color(0.6, 0.5, 0.38))
+	var palm_mesh := SphereMesh.new()
+	palm_mesh.radius = 0.04
+	palm_mesh.height = 0.05
+	palm_mesh.radial_segments = 10
+	palm_mesh.rings = 5
+	var pm := _mesh(arm, palm_mesh, mat, palm + Vector3(0.0, 0.0, -0.035))
+	pm.scale = Vector3(1.05, 0.55, 1.2)
+	var nail_mat: StandardMaterial3D = _metal(Color(0.16, 0.14, 0.12))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_base + 2
-	for f in 4:
-		var x_off: float = (float(f) - 1.5) * 0.026
-		var claw_len: float = rng.randf_range(0.09, 0.17)
+	var tips: Array = []
+	for f in 5:
+		var thumb: bool = f == 4
+		var fx: float = (float(f) - 1.5) * 0.024 if not thumb else -sgn * 0.052
+		var flen: float = rng.randf_range(0.11, 0.16) if not thumb else 0.08
+		var root: Vector3 = palm + Vector3(fx * 0.8, 0.0, -0.05 if not thumb else 0.0)
+		var spread: float = fx * (1.3 if not thumb else 1.0) + rng.randf_range(-0.012, 0.012)
 		var curl: Array = [
-			palm + Vector3(x_off * 0.4, 0.0, 0.0),
-			palm + Vector3(x_off, -0.004, -claw_len * 0.5),
-			palm + Vector3(x_off * 1.35 + rng.randf_range(-0.01, 0.01), -0.02, -claw_len),
+			root,
+			root + Vector3(spread * 0.5, 0.012, -flen * 0.45),                       # knuckle, raised
+			root + Vector3(spread * 0.9, -0.002, -flen * 0.80),
+			root + Vector3(spread * 1.1, -0.012 - rng.randf_range(0.0, 0.01), -flen),  # tip touching floor
 		]
-		var cp: PackedVector3Array = RuinGen.spline(curl, 6)
-		_mesh(arm, RuinGen.tube_mesh(cp, PackedFloat32Array([0.012, 0.008, 0.005, 0.002]), 5, 0.1, seed_base + 10 + f, true, true), claw_mat)
+		var cp: PackedVector3Array = RuinGen.spline(curl, 7)
+		_mesh(arm, RuinGen.tube_mesh(cp, PackedFloat32Array([0.0125, 0.0105, 0.009, 0.0075, 0.005]), 6, 0.08, seed_base + 10 + f, true, true), mat)
+		tips.append(cp[cp.size() - 1])
+	for tp in tips:
+		var nail := SphereMesh.new()
+		nail.radius = 0.0065
+		nail.height = 0.011
+		nail.radial_segments = 6
+		nail.rings = 3
+		_mesh(arm, nail, nail_mat, (tp as Vector3) + Vector3(0.0, 0.003, -0.003))
 
-	# Two rusty shackle bands biting into the forearm
-	var band_mat: StandardMaterial3D = _metal(Color(0.5, 0.3, 0.2))
-	for bi in 2:
-		var idx: int = int(n * (0.30 + 0.12 * bi))
+	# One rusty shackle band biting the forearm (the other arm: two)
+	var band_mat: StandardMaterial3D = _metal(Color(0.38, 0.22, 0.15))
+	for bi in (1 if is_left else 2):
+		var idx: int = int(n * (0.30 + 0.16 * bi))
 		var tor := TorusMesh.new()
-		tor.inner_radius = radii[idx] * 0.95
-		tor.outer_radius = radii[idx] * 1.12
-		tor.rings = 10
+		tor.inner_radius = radii[idx] * 0.97
+		tor.outer_radius = radii[idx] * 1.14
+		tor.rings = 12
 		tor.ring_segments = 6
 		var band := _mesh(arm, tor, band_mat, pts[idx])
-		band.rotation_degrees = Vector3(90.0 + rng.randf_range(-8.0, 8.0), rng.randf_range(-10.0, 10.0), 0.0)
+		var dir: Vector3 = (pts[idx + 1] - pts[idx - 1]).normalized()
+		band.basis = Basis(Quaternion(Vector3.UP, dir))
 
 	if is_left:
 		_build_compass(arm, pts, radii, seed_base)
@@ -156,103 +179,121 @@ func _build_arm(is_left: bool) -> Node3D:
 
 func _build_compass(arm: Node3D, pts: PackedVector3Array, radii: PackedFloat32Array, seed_base: int) -> void:
 	var n: int = pts.size()
-	var ci: int = int(n * 0.76)
-	var base: Vector3 = pts[ci] + Vector3(0.0, radii[ci] * 0.8, 0.0)
+	# Strapped on top of the forearm like a wrist instrument, tilted a little towards the eye
+	var ci: int = int(n * 0.56)
+	var base: Vector3 = pts[ci] + Vector3(0.0, radii[ci] * 0.92, 0.0)
+	var along: Vector3 = (pts[ci + 1] - pts[ci - 1]).normalized()
 	var housing := Node3D.new()
 	housing.position = base
-	housing.rotation_degrees = Vector3(7.0, 20.0, -10.0)   # jammed in crooked
+	housing.rotation_degrees = Vector3(-rad_to_deg(asin(clampf(-along.y, -1.0, 1.0))) + 10.0, 8.0, 5.0)
 	arm.add_child(housing)
 
-	var metal: StandardMaterial3D = _metal(Color(0.7, 0.45, 0.32))
+	var metal: StandardMaterial3D = _metal(Color(0.55, 0.36, 0.26))
 	var cyl := CylinderMesh.new()
-	cyl.top_radius = 0.058
-	cyl.bottom_radius = 0.066
-	cyl.height = 0.034
-	cyl.radial_segments = 11
+	cyl.top_radius = 0.052
+	cyl.bottom_radius = 0.058
+	cyl.height = 0.03
+	cyl.radial_segments = 12
 	_mesh(housing, cyl, metal)
 
 	var bez := TorusMesh.new()
-	bez.inner_radius = 0.047
-	bez.outer_radius = 0.064
-	bez.rings = 12
+	bez.inner_radius = 0.042
+	bez.outer_radius = 0.057
+	bez.rings = 14
 	bez.ring_segments = 6
-	_mesh(housing, bez, metal, Vector3(0.0, 0.017, 0.0))
+	_mesh(housing, bez, metal, Vector3(0.0, 0.015, 0.0))
 
 	var dial := CylinderMesh.new()
-	dial.top_radius = 0.049
-	dial.bottom_radius = 0.049
+	dial.top_radius = 0.044
+	dial.bottom_radius = 0.044
 	dial.height = 0.004
-	dial.radial_segments = 14
+	dial.radial_segments = 16
 	var dial_mat := StandardMaterial3D.new()
 	dial_mat.albedo_color = Color(0.02, 0.05, 0.07)
 	dial_mat.roughness = 0.4
-	_mesh(housing, dial, dial_mat, Vector3(0.0, 0.016, 0.0))
+	_mesh(housing, dial, dial_mat, Vector3(0.0, 0.014, 0.0))
 
 	# Cracked glass: a flattened, barely-there dome
 	var dome := SphereMesh.new()
-	dome.radius = 0.05
-	dome.height = 0.03
+	dome.radius = 0.045
+	dome.height = 0.024
 	var glass := StandardMaterial3D.new()
 	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	glass.albedo_color = Color(0.5, 0.7, 0.9, 0.16)
+	glass.albedo_color = Color(0.5, 0.7, 0.9, 0.14)
 	glass.roughness = 0.05
 	glass.metallic = 0.3
-	_mesh(housing, dome, glass, Vector3(0.0, 0.022, 0.0))
+	_mesh(housing, dome, glass, Vector3(0.0, 0.019, 0.0))
 
 	# Needle
 	_needle_pivot = Node3D.new()
-	_needle_pivot.position = Vector3(0.0, 0.022, 0.0)
+	_needle_pivot.position = Vector3(0.0, 0.020, 0.0)
 	housing.add_child(_needle_pivot)
 	_needle_mat = StandardMaterial3D.new()
 	_needle_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_needle_mat.albedo_color = Color(0.4, 0.8, 1.0)
 	var nb := PrismMesh.new()
-	nb.size = Vector3(0.012, 0.075, 0.003)
-	var needle := _mesh(_needle_pivot, nb, _needle_mat, Vector3(0.0, 0.0, -0.03))
-	needle.rotation_degrees = Vector3(-90.0, 0.0, 0.0)   # prism tip points forward (-Z), lies flat
+	nb.size = Vector3(0.011, 0.07, 0.003)
+	var needle := _mesh(_needle_pivot, nb, _needle_mat, Vector3(0.0, 0.0, -0.028))
+	needle.rotation_degrees = Vector3(-90.0, 0.0, 0.0)
+
+	# Two straps of rusted band wrapped around the forearm either side of the dial
+	var strap_mat: StandardMaterial3D = _metal(Color(0.30, 0.20, 0.15))
+	for off in [-3, 3]:
+		var si: int = clampi(ci + off, 1, n - 2)
+		var st := TorusMesh.new()
+		st.inner_radius = radii[si] * 0.96
+		st.outer_radius = radii[si] * 1.12
+		st.rings = 12
+		st.ring_segments = 5
+		var sm := _mesh(arm, st, strap_mat, pts[si])
+		var d2: Vector3 = (pts[si + 1] - pts[si - 1]).normalized()
+		sm.basis = Basis(Quaternion(Vector3.UP, d2))
 
 	# Light under the skin
 	_light = OmniLight3D.new()
 	_light.position = base + Vector3(0.0, 0.07, 0.0)
-	_light.omni_range = 1.8
-	_light.light_energy = 0.5
+	_light.omni_range = 2.6
+	_light.light_energy = 1.5
 	_light.light_color = Color(0.1, 0.55, 1.0)
 	arm.add_child(_light)
 
-	# Black metal roots bursting out of the arm and the compass rim (jagged random walks)
+	# Black metal roots: thin, creeping ALONG the skin from the compass rim toward the hand
+	# (hugging the surface, not branching into the air), tips glinting.
 	var root_mat := StandardMaterial3D.new()
 	root_mat.albedo_color = Color(0.015, 0.015, 0.02)
 	root_mat.roughness = 0.9
 	root_mat.metallic = 0.3
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_base + 99
-	for i in 9:
-		var t: float = rng.randf_range(0.42, 0.92)
-		var k: int = int(n * t)
-		var p: Vector3 = pts[k] + Vector3(rng.randf_range(-0.02, 0.02), radii[k] * 0.7, rng.randf_range(-0.02, 0.02))
-		var dir := Vector3(rng.randf_range(-1.0, 1.0), rng.randf_range(0.4, 1.0), rng.randf_range(-0.8, 0.5)).normalized()
-		var path := PackedVector3Array([p])
-		var rr := PackedFloat32Array([0.011])
-		for s in 5:
-			dir = (dir + Vector3(rng.randf_range(-0.9, 0.9), rng.randf_range(-0.5, 0.6), rng.randf_range(-0.9, 0.9))).normalized()
-			p += dir * rng.randf_range(0.04, 0.09)
-			path.append(p)
-			rr.append(maxf(0.0015, 0.011 * (1.0 - float(s + 1) / 6.0)))
-		_mesh(arm, RuinGen.tube_mesh(path, rr, 5, 0.25, seed_base + 200 + i, false, true), root_mat)
-		if i % 3 == 0:
+	for i in 5:
+		var start: int = clampi(ci + rng.randi_range(-1, 1), 1, n - 3)
+		var ang: float = rng.randf_range(-1.1, 1.1)                        # around the forearm
+		var path := PackedVector3Array()
+		var rr := PackedFloat32Array()
+		var steps: int = rng.randi_range(6, 9)
+		for k in steps:
+			var idx: int = clampi(start + k * rng.randi_range(1, 2) - 2, 0, n - 1)
+			ang += rng.randf_range(-0.35, 0.35)
+			var rad: float = radii[idx] * 1.02
+			var off2 := Vector3(sin(ang) * rad, cos(ang) * rad, 0.0)
+			path.append(pts[idx] + off2)
+			rr.append(maxf(0.0015, 0.0075 * (1.0 - float(k) / float(steps))))
+		_mesh(arm, RuinGen.tube_mesh(path, rr, 5, 0.2, seed_base + 200 + i, false, true), root_mat)
+		if i % 2 == 0:
 			var tip_mat := StandardMaterial3D.new()
 			tip_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			tip_mat.albedo_color = Color(0.3, 0.7, 1.0)
 			var bead := SphereMesh.new()
-			bead.radius = 0.008
-			bead.height = 0.016
+			bead.radius = 0.006
+			bead.height = 0.012
 			bead.radial_segments = 6
 			bead.rings = 3
-			_mesh(arm, bead, tip_mat, p)
+			_mesh(arm, bead, tip_mat, path[path.size() - 1])
 			_tip_mats.append(tip_mat)
 
 	# Skin label: white-voice lines written on the forearm
 	_skin_label = Label3D.new()
+	_skin_label.font = FPFonts.mono()
 	_skin_label.font_size = 48
 	_skin_label.pixel_size = 0.0011
 	_skin_label.outline_size = 8
@@ -261,7 +302,7 @@ func _build_compass(arm: Node3D, pts: PackedVector3Array, radii: PackedFloat32Ar
 	_skin_label.shaded = false
 	_skin_label.width = 420.0
 	_skin_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_skin_label.position = pts[int(n * 0.30)] + Vector3(0.0, 0.085, 0.0)
+	_skin_label.position = pts[int(n * 0.28)] + Vector3(0.0, radii[int(n * 0.28)] + 0.01, 0.0)
 	_skin_label.rotation_degrees = Vector3(-90.0, 0.0, 0.0)
 	arm.add_child(_skin_label)
 
@@ -339,7 +380,7 @@ func _process(delta: float) -> void:
 	var glow: float = (1.3 if _active else 0.55) * flick * lit
 	var lc: Color = Color(0.1, 0.55, 1.0).lerp(Color(1.0, 0.08, 0.05), inter)
 	_light.light_color = lc
-	_light.light_energy = ((0.9 if _active else 0.35) * flick + beat * 0.6) * lit
+	_light.light_energy = ((2.0 if _active else 1.1) * flick + beat * 0.6) * lit
 	_needle_mat.albedo_color = (lc.lightened(0.3) if not _blind else Color(0.02, 0.02, 0.03))
 	for tm in _tip_mats:
 		tm.albedo_color = lc.lightened(0.2) if not _blind else Color(0.01, 0.01, 0.015)

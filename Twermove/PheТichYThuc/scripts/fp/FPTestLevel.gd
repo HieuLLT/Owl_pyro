@@ -108,11 +108,13 @@ func _build_environment() -> void:
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color(0.0, 0.0, 0.0)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.07, 0.05, 0.08)
+	env.ambient_light_color = Color(0.024, 0.020, 0.030)
 	env.ambient_light_energy = 1.0
 	env.fog_enabled = true
-	env.fog_light_color = Color(0.06, 0.015, 0.025)
-	env.fog_density = 0.03
+	env.fog_light_color = Color(0.018, 0.004, 0.008)
+	env.fog_density = 0.065
+	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.tonemap_exposure = 0.9
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
@@ -120,7 +122,7 @@ func _build_environment() -> void:
 	# ruins and the floating islands against the black (the red neon still dominates).
 	var cold := DirectionalLight3D.new()
 	cold.light_color = Color(0.45, 0.52, 0.75)
-	cold.light_energy = 0.28
+	cold.light_energy = 0.05
 	cold.shadow_enabled = false
 	cold.rotation_degrees = Vector3(-35.0, 40.0, 0.0)
 	add_child(cold)
@@ -369,8 +371,8 @@ func _neon(pos: Vector3, roll_deg: float) -> void:
 	var l := FlickerLight.new()
 	l.position = Vector3(0.0, -0.3, 0.0)
 	l.light_color = Color(1.0, 0.1, 0.06)
-	l.omni_range = 9.0
-	l.base_energy = 2.4
+	l.omni_range = 6.0
+	l.base_energy = 1.4
 	l.dropout_chance = _rng.randf_range(0.15, 0.5)
 	l.tube_material = tube_mat
 	holder.add_child(l)
@@ -389,8 +391,8 @@ func _build_coolant_and_shard() -> void:
 	var pl := OmniLight3D.new()
 	pl.position = Vector3(POOL_CENTER.x, py + 0.5, POOL_CENTER.y)
 	pl.light_color = Color(0.1, 0.9, 0.8)
-	pl.light_energy = 0.7
-	pl.omni_range = 4.5
+	pl.light_energy = 0.35
+	pl.omni_range = 3.2
 	add_child(pl)
 
 	# Memory shard: the compass target (clearing at z -25)
@@ -411,8 +413,8 @@ func _build_coolant_and_shard() -> void:
 	shard.add_child(sm)
 	var sl := OmniLight3D.new()
 	sl.light_color = Color(0.2, 1.0, 0.9)
-	sl.light_energy = 0.8
-	sl.omni_range = 3.0
+	sl.light_energy = 0.45
+	sl.omni_range = 2.4
 	shard.add_child(sl)
 	add_child(shard)
 
