@@ -54,6 +54,9 @@ var _p2_angle_pool: Array[float] = []
 func _ready() -> void:
 	EventBus.memory_puzzle_completed.connect(_on_puzzle_solved)
 	_enter_phase(Phase.P1_SWEEP)
+	# A1: Boss ambient loop → Ambient bus (âm nền boss fight, không lấn át SFX)
+	if ambient_audio:
+		ambient_audio.bus = AudioManager.BUS_AMBIENT
 
 	# Collect all wave Area2D children
 	for child in wave_emitter.get_children():

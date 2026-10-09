@@ -7,6 +7,21 @@
 #   Mouse         look            W/A/S/D     drag in that direction
 #   Space (HOLD)  close eyes (Sensory Deprivation)  — pitch black, only sound remains
 #   Q             Vestige Needle (compass arm)      Esc  release mouse
+#
+# ── Hạng mục B (UI/UX Pass) ─────────────────────────────────────────────────
+# B1 – Render Layer (clipping fix):
+#   CompassArm now lives inside ArmViewport (a SubViewport with its own depth
+#   buffer + own world).  The result is composited over the world via a
+#   CanvasLayer / TextureRect overlay, so the arm is ALWAYS drawn on top
+#   regardless of camera angle or proximity to surfaces.
+#
+# B2a – Pivot correction:
+#   ArmViewport.setup() offsets the CompassArm root to Vector3(0, -0.18, 0.08)
+#   — the virtual shoulder position — so the arm enters from the correct edge.
+#
+# B2b – Weapon Sway (ArmSway node):
+#   ArmSway reads raw mouse deltas and lerps a rotation offset onto the arm,
+#   creating the heavy, lagging body feel of мрак's necrotic frame.
 class_name FPController
 extends CharacterBody3D
 
@@ -33,7 +48,11 @@ var _needle_on: bool = false
 var _dead: bool = false
 var _moving_now: bool = false
 
-var compass_arm: CompassArm
+# B1/B2: arm subsystem — viewport, camera sync, and sway
+var _arm_viewport: ArmViewport
+var _arm_sway: ArmSway
+var compass_arm: CompassArm  # convenience ref into _arm_viewport
+
 var _drag_player: AudioStreamPlayer3D
 var _heart_player: AudioStreamPlayer
 
@@ -47,17 +66,45 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	head.position.y = EYE_HEIGHT
 
-	compass_arm = CompassArm.new()
-	camera.add_child(compass_arm)
+	# ── B1: SubViewport render isolation ──────────────────────────────────
+	_arm_viewport = ArmViewport.new()
+	_arm_viewport.name = "ArmViewport"
+	add_child(_arm_viewport)
+	_arm_viewport.setup(camera)          # pass main camera for transform sync
+	compass_arm = _arm_viewport.compass_arm
+
+	# ── B1: Composite the arm viewport over the world via CanvasLayer ──────
+	var ui_layer := CanvasLayer.new()
+	ui_layer.name = "ArmOverlayUI"
+	ui_layer.layer = 10              # above all world UI; below schizophrenic HUD
+	add_child(ui_layer)
+
+	var arm_rect := TextureRect.new()
+	arm_rect.name = "ArmRect"
+	arm_rect.texture = _arm_viewport.get_texture()
+	arm_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	arm_rect.stretch_mode = TextureRect.STRETCH_SCALE
+	arm_rect.anchor_right  = 1.0     # fill full screen
+	arm_rect.anchor_bottom = 1.0
+	arm_rect.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+	ui_layer.add_child(arm_rect)
+
+	# ── B2b: Arm sway (decoupled from camera) ───────────────────────────────
+	_arm_sway = ArmSway.new()
+	_arm_sway.name = "ArmSway"
+	add_child(_arm_sway)
+	_arm_sway.setup(compass_arm)
 
 	_drag_player = AudioStreamPlayer3D.new()
 	_drag_player.stream = FPUtil.load_sound("res://assets/audio/fp/drag.wav")
 	_drag_player.unit_size = 4.0
+	_drag_player.bus = AudioManager.BUS_SFX          # A1: drag sound → SFX bus
 	add_child(_drag_player)
 
 	_heart_player = AudioStreamPlayer.new()
 	_heart_player.stream = FPUtil.load_sound("res://assets/audio/fp/heartbeat.wav", true)
 	_heart_player.volume_db = -4.0
+	_heart_player.bus = AudioManager.BUS_HEARTBEAT   # A1: heartbeat → Heartbeat bus
 	add_child(_heart_player)
 
 	EventBus.mrak_blink_toggled.connect(_on_blink_changed)
@@ -134,6 +181,7 @@ func _process(delta: float) -> void:
 	if compass_arm:
 		compass_arm.beat = _beat_kick
 		compass_arm.set_drag(_pulse, _drag_phase, _moving_now)
+		# B2b: sway reads mouse delta from its own _input(); nothing extra needed here.
 
 func _update_heartbeat(delta: float) -> void:
 	var nec: float = GameManager.necrosis / 100.0

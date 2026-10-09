@@ -483,9 +483,12 @@ func _spawn_player() -> void:
 	add_child(FPOverlay.new())
 
 func _build_audio() -> void:
+	# A1: Fan hum → Bus Ambient (-18 dB). Âm nền chạy liên tục nhưng ở mức
+	# âm lượng thấp đến mức não bộ bỏ qua nó — cho đến khi nó tắt.
 	var fan := AudioStreamPlayer.new()
 	fan.stream = FPUtil.load_sound("res://assets/audio/fp/fan_hum.wav", true)
-	fan.volume_db = -12.0
+	fan.volume_db = -12.0           # volume của player; bus Ambient sẽ hạ thêm -18 dB
+	fan.bus = AudioManager.BUS_AMBIENT   # A1: fan → Ambient bus
 	fan.autoplay = true
 	add_child(fan)
 	_thud_timer = Timer.new()
@@ -495,10 +498,11 @@ func _build_audio() -> void:
 	_thud_timer.start(randf_range(8.0, 16.0))
 
 func _on_thud() -> void:
-	var p := AudioStreamPlayer3D.new()
-	p.stream = FPUtil.load_sound("res://assets/audio/fp/metal_thud.wav")
+	# A2: Spatial Audio — sử dụng AudioManager.make_spatial(IMPACT) để có
+	# Attenuation Curve chuẩn. Người chơi có thể định vị được nguồn tiếng theo tai.
+	var p: AudioStreamPlayer3D = AudioManager.make_spatial(AudioManager.SpatialType.IMPACT)
+	p.stream   = FPUtil.load_sound("res://assets/audio/fp/metal_thud.wav")
 	p.position = Vector3(randf_range(-3.0, 3.0), 1.5, randf_range(-38.0, -2.0))
-	p.unit_size = 6.0
 	p.finished.connect(p.queue_free)
 	add_child(p)
 	if p.stream:

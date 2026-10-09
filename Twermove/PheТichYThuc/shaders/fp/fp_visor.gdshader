@@ -13,8 +13,8 @@ shader_type canvas_item;
 uniform sampler2D screen_tex : hint_screen_texture, repeat_disable, filter_linear;
 
 uniform float damage : hint_range(0.0, 1.0) = 0.2;
-uniform float rim_start : hint_range(0.2, 0.9) = 0.45;
-uniform float rim_softness : hint_range(0.02, 0.5) = 0.18;
+uniform float rim_start : hint_range(0.2, 0.9) = 0.40;   // kéo vào gần hơn (0.45 -> 0.40)
+uniform float rim_softness : hint_range(0.02, 0.5) = 0.14; // rìm cứng hơn (0.18 -> 0.14)
 uniform vec2 impact_a = vec2(0.84, 0.20);
 uniform vec2 impact_b = vec2(0.14, 0.80);
 uniform float crack_scale : hint_range(3.0, 30.0) = 9.0;
@@ -102,9 +102,14 @@ void fragment() {
 	col += vec3(0.75, 0.82, 0.9) * crack * 0.55;
 	col *= 1.0 - crack * 0.15;
 
-	// Soot: the view darkens steadily towards the edges, the whole glass is dim
-	col *= 1.0 - smoothstep(0.12, 0.52, d) * (0.40 + 0.3 * damage);
-	col *= 0.82;
+	// Soot: the view darkens steadily towards the edges, the whole glass is dim.
+	// At high damage the soot is heavier — the player's vision shrinks.
+	col *= 1.0 - smoothstep(0.08, 0.48, d) * (0.50 + 0.38 * damage);
+	col *= 0.78;  // overall dim: the glass is very dirty
+
+	// Extra deep corner crush (Cracked Vignette: corners nearly black at damage > 0.6)
+	float corner_crush = smoothstep(0.30, 0.72, length(c)) * damage * 0.55;
+	col *= 1.0 - corner_crush;
 
 	// Missing shards, then the black rim
 	col = mix(col, vec3(0.0), shard_gone);

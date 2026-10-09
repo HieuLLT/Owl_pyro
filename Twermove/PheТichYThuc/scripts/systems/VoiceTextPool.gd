@@ -35,6 +35,9 @@ var _free: Array[RichTextLabel] = []
 var _active: Array[RichTextLabel] = []            # oldest first
 var _tweens: Dictionary = {}                      # RichTextLabel -> Array[Tween]
 
+# Shader pre-loaded once, shared across all red labels (cheap: same ShaderMaterial.duplicate)
+var _leak_shader: Shader = null
+
 # ─────────────────────────────────────────────
 # SETUP
 # ─────────────────────────────────────────────
@@ -42,6 +45,9 @@ var _tweens: Dictionary = {}                      # RichTextLabel -> Array[Tween
 func setup(host: Node, font: Font = null) -> void:
 	_host = host
 	_font = font
+	# Pre-load the memory leak glitch shader once
+	if ResourceLoader.exists("res://shaders/fp/memory_leak_text.gdshader"):
+		_leak_shader = load("res://shaders/fp/memory_leak_text.gdshader") as Shader
 	for i in range(POOL_SIZE):
 		var label := _make_label()
 		_host.add_child(label)
@@ -57,6 +63,12 @@ func _make_label() -> RichTextLabel:
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.visible = false
 	l.modulate.a = 0.0
+	# FIX: transparent background — eliminates the red solid-box artifact.
+	# Godot RichTextLabel has a default opaque StyleBox; replace it with empty.
+	var empty_style := StyleBoxEmpty.new()
+	l.add_theme_stylebox_override("normal",  empty_style)
+	l.add_theme_stylebox_override("focus",   empty_style)
+	l.add_theme_stylebox_override("read_only", empty_style)
 	if _font:
 		l.add_theme_font_override("normal_font", _font)
 	return l
@@ -92,6 +104,18 @@ func show_text(text: String, voice: Voice, pos: Vector2, intensity: float = 0.5,
 	label.self_modulate = Color.WHITE
 	label.visible = true
 	label.set_meta("voice", voice)
+
+	if voice == Voice.RED and _leak_shader != null:
+		# Glitch shader — duplicated so each label has independent uniform values.
+		var mat := ShaderMaterial.new()
+		mat.shader = _leak_shader
+		mat.set_shader_parameter("intensity", intensity)
+		# Tune tearing probability: whisper = rarely tears, scream = tears every frame
+		mat.set_shader_parameter("tear_prob", lerpf(0.08, 0.55, intensity))
+		mat.set_shader_parameter("rgb_split", lerpf(0.003, 0.016, intensity))
+		label.material = mat
+	else:
+		label.material = null  # clear if reused from pool
 
 	_active.append(label)
 	var list: Array = []
@@ -177,12 +201,17 @@ func _build_bbcode(text: String, voice: Voice, intensity: float, red_hex: String
 			return "[wave amp=%d freq=%.1f connected=0][color=%s]%s[/color][/wave]" % [
 				int(lerpf(6.0, 14.0, intensity)), lerpf(1.5, 3.0, intensity), WHITE_COLOR, safe]
 		_:
+			# RED VOICE — Brutalist Glitch-core layering:
+			# [shake] = chữ rung lắc liên tục (tiếng gào thét nội tâm)
+			# [tornado] khi intensity cao = chữ xoay hỗn loạn
+			# Outline đen dày = chữ nổi rõ trên mọi nền
 			var inner: String = "[color=%s]%s[/color]" % [red_hex, safe]
 			var s: String = "[shake rate=%d level=%d connected=0]%s[/shake]" % [
-				int(lerpf(12.0, 30.0, intensity)), int(lerpf(3.0, 12.0, intensity)), inner]
-			if intensity > 0.75:
+				int(lerpf(15.0, 35.0, intensity)), int(lerpf(5.0, 18.0, intensity)), inner]
+			if intensity > 0.5:
+				# Thêm tornado sớm hơn (0.5 thay vì 0.75) — glitch-core cảm giác rối loạn
 				s = "[tornado radius=%.1f freq=%.1f connected=0]%s[/tornado]" % [
-					lerpf(1.0, 3.0, intensity), lerpf(2.0, 6.0, intensity), s]
+					lerpf(1.0, 4.5, intensity), lerpf(1.5, 7.0, intensity), s]
 			return s
 
 func _font_size(voice: Voice, intensity: float) -> int:

@@ -48,6 +48,11 @@ var _drag_pulse: float = 0.0
 var _moving_blend: float = 0.0
 var _moving: bool = false
 
+## ArmCamera reference — injected by ArmViewport after setup so the compass
+## needle can correctly calculate world-space angles even though CompassArm no
+## longer lives inside a Camera3D node.  Fallback: auto-find on first _process.
+var arm_camera: Camera3D = null
+
 func _ready() -> void:
 	name = "CompassArm"
 	_mat_l = FPUtil.make_shader_material("res://shaders/fp/arm_compass.gdshader")
@@ -359,7 +364,11 @@ func _process(delta: float) -> void:
 	if _lie_timer <= 0.0:
 		_lie_timer = randf_range(4.0, 8.0)
 		_lying = randf() < LIE_CHANCE
-	var cam := get_parent() as Camera3D
+	# B1 compat: parent is now ArmViewport (SubViewport), not Camera3D.
+	# Use the injected arm_camera; fall back to searching the scene.
+	var cam: Camera3D = arm_camera
+	if cam == null:
+		cam = get_viewport().get_camera_3d()
 	var target_node: Node3D = _nearest("lair" if _lying else "memory_shard")
 	var target_yaw: float = _needle_yaw + delta * 0.8
 	if cam and target_node:

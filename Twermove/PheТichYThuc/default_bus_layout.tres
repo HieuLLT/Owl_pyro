@@ -1,7 +1,9 @@
 [gd_resource type="AudioBusLayout" format=3 uid="uid://busphetich001"]
 
 [resource]
-bus_count = 5
+bus_count = 7
+
+# ── BUS 0: MASTER ─────────────────────────────────────────────────────────────
 bus/0/name = &"Master"
 bus/0/solo = false
 bus/0/mute = false
@@ -9,31 +11,69 @@ bus/0/bypass_fx = false
 bus/0/volume_db = 0.0
 bus/0/send = &""
 bus/0/effect_count = 0
-bus/1/name = &"SFX"
+
+# ── BUS 1: AMBIENT ────────────────────────────────────────────────────────────
+# Tiếng quạt tản nhiệt, nhiễu sóng nền. Hạ -18dB để tạo không khí ngột ngạt
+# mà không lấn át các tín hiệu âm thanh quan trọng (kim la bàn, va đập).
+# Mục tiêu: người chơi NGHE THẤY nhưng não BỎ QUA cho đến khi nó biến mất.
+bus/1/name = &"Ambient"
 bus/1/solo = false
 bus/1/mute = false
 bus/1/bypass_fx = false
-bus/1/volume_db = 0.0
+bus/1/volume_db = -18.0
 bus/1/send = &"Master"
 bus/1/effect_count = 0
-bus/2/name = &"Music"
+
+# ── BUS 2: SFX ────────────────────────────────────────────────────────────────
+# Va đập kim loại, tương tác vật lý. 0dB — nổi bật rõ ràng.
+bus/2/name = &"SFX"
 bus/2/solo = false
 bus/2/mute = false
 bus/2/bypass_fx = false
-bus/2/volume_db = -6.0
+bus/2/volume_db = 0.0
 bus/2/send = &"Master"
 bus/2/effect_count = 0
-bus/3/name = &"Heartbeat"
+
+# ── BUS 3: UI_MENTAL ─────────────────────────────────────────────────────────
+# Âm thanh Giao diện Tâm lý (SchizophrenicUI): tiếng "tíc tíc khô khốc" khi
+# chữ hiện lên da thịt, tiếng nhiễu điện, giọng Firewall / Memory Leak.
+# Tách riêng để có thể áp AudioEffect riêng (distortion khi necrosis cao).
+bus/3/name = &"UI_Mental"
 bus/3/solo = false
 bus/3/mute = false
 bus/3/bypass_fx = false
 bus/3/volume_db = 0.0
 bus/3/send = &"Master"
 bus/3/effect_count = 0
-bus/4/name = &"Spatial"
+
+# ── BUS 4: HEARTBEAT ─────────────────────────────────────────────────────────
+# Nhịp tim cơ học của мрак — cần tách riêng để có thể mix và sidechain
+# với Ambient về sau (Ambient ducking khi tim đập mạnh).
+bus/4/name = &"Heartbeat"
 bus/4/solo = false
 bus/4/mute = false
 bus/4/bypass_fx = false
 bus/4/volume_db = 0.0
 bus/4/send = &"Master"
 bus/4/effect_count = 0
+
+# ── BUS 5: SPATIAL ───────────────────────────────────────────────────────────
+# AudioStreamPlayer3D — Xác Máy Đói Khát, các thực thể phát tiếng động
+# trong môi trường. Volume thấp hơn SFX một chút để có cảm giác "xa hơn".
+bus/5/name = &"Spatial"
+bus/5/solo = false
+bus/5/mute = false
+bus/5/bypass_fx = false
+bus/5/volume_db = -3.0
+bus/5/send = &"Master"
+bus/5/effect_count = 0
+
+# ── BUS 6: MUSIC ─────────────────────────────────────────────────────────────
+# Dự phòng cho nhạc nền / stinger.
+bus/6/name = &"Music"
+bus/6/solo = false
+bus/6/mute = false
+bus/6/bypass_fx = false
+bus/6/volume_db = -6.0
+bus/6/send = &"Master"
+bus/6/effect_count = 0

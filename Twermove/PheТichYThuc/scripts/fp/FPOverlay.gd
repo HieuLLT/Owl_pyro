@@ -113,29 +113,65 @@ func _on_leak(msg: String, intensity: float) -> void:
 
 ## Pastes the line (and, when loud, fragments of it) at random places over the view.
 ## Intensity 0 = one small whisper; 1 = ten huge lines that blot out most of the screen.
+## Vent Art layering: primary instance + ghost echoes at varied opacity/scale/offset.
 func _flood_red(msg: String, intensity: float) -> void:
 	var size: Vector2 = get_viewport().get_visible_rect().size
 	var count: int = clampi(1 + roundi(intensity * 9.0), 1, 10)
 	var words: PackedStringArray = msg.split(" ", false)
+
 	for i in count:
+		# ── Primary text instance ──────────────────────────────────────────
 		var text: String = msg
 		if i > 0 and words.size() > 3:
 			var a: int = randi_range(0, words.size() - 3)
 			var b: int = randi_range(a + 2, mini(a + 5, words.size()))
 			text = " ".join(words.slice(a, b))
+
 		var pos := Vector2(randf_range(0.0, 0.62) * size.x, randf_range(0.04, 0.78) * size.y)
 		var inten: float = clampf(intensity + randf_range(-0.15, 0.15), 0.0, 1.0)
 		var emo: String = FPFonts.pick_emotion(inten, GameManager.necrosis / 100.0, GameManager.thermal, GameManager.is_blind)
-		var label: RichTextLabel = _red_pool.show_text(text, VoiceTextPool.Voice.RED, pos, inten, 2.2 + intensity * 1.8, emo)
+
+		# Layering: scale và opacity thay đổi mạnh theo vị trí — không đồng đều
+		# Lớp gần = to và sáng; lớp xa = nhỏ và mờ (Vent Art depth)
+		var layer_t: float = float(i) / float(max(count - 1, 1))
+		var base_scale: float = lerpf(2.2, 0.75, layer_t) + intensity * lerpf(0.8, 0.3, layer_t)
+		var base_alpha_mult: float = lerpf(1.0, 0.35, layer_t)  # lớp sau mờ dần
+
+		var label: RichTextLabel = _red_pool.show_text(
+			text, VoiceTextPool.Voice.RED, pos, inten,
+			(2.2 + intensity * 1.8) * lerpf(1.0, 0.65, layer_t), emo
+		)
 		if label:
-			# Red on black: a thick dark outline, scaled up with the voice's volume
-			label.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0, 1.0))
-			label.add_theme_constant_override("outline_size", 6 + roundi(intensity * 8.0))
-			label.scale = Vector2.ONE * (1.45 + intensity * 1.2)
+			label.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0, 0.9))
+			label.add_theme_constant_override("outline_size", 5 + roundi(intensity * 9.0))
+			label.scale = Vector2.ONE * base_scale
+			# Opacity đa tầng — não người chơi đọc được lớp sáng nhất, lớp mờ gây bất an
+			label.modulate.a *= base_alpha_mult
 			if emo == "envy":                       # overheat: constant flicker (report 3.2)
 				var fl := label.create_tween().set_loops(30)
 				fl.tween_property(label, "self_modulate:a", 0.25, 0.06)
 				fl.tween_property(label, "self_modulate:a", 1.0, 0.06)
+
+		# ── Ghost echoes (Vent Art: luồng suy nghĩ đè bẹp nhau) ─────────────
+		# Khi intensity cao, thêm 1-2 bản sao mờ lệch vị trí và scale
+		# → tạo cảm giác "chữ đang nhân bản không kiểm soát được"
+		if intensity > 0.55 and i < count - 1:
+			var ghost_count: int = 1 if intensity < 0.8 else 2
+			for _g in ghost_count:
+				var ghost_offset := Vector2(
+					randf_range(-55.0, 55.0) * intensity,
+					randf_range(-30.0, 30.0) * intensity
+				)
+				var ghost_pos: Vector2 = pos + ghost_offset
+				var ghost_scale: float = base_scale * randf_range(0.45, 0.80)
+				var ghost_inten: float = clampf(inten * 0.55, 0.0, 1.0)
+				var ghost_life: float = (2.2 + intensity * 1.8) * randf_range(0.4, 0.75)
+				var ghost: RichTextLabel = _red_pool.show_text(
+					text, VoiceTextPool.Voice.RED, ghost_pos, ghost_inten, ghost_life, emo
+				)
+				if ghost:
+					ghost.scale    = Vector2.ONE * ghost_scale
+					ghost.modulate.a *= randf_range(0.18, 0.42)  # rất mờ — chỉ gây bất an
 
 func _on_blink(blind: bool) -> void:
 	if blind:

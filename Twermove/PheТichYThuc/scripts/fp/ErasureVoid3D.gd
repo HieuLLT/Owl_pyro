@@ -63,6 +63,7 @@ func _ready() -> void:
 	crackle.unit_size = 5.0
 	crackle.max_distance = 40.0
 	crackle.volume_db = -2.0
+	crackle.bus = AudioManager.BUS_AMBIENT   # A1: The Erasure âm rần rĩ → Ambient bus
 	crackle.autoplay = true
 	add_child(crackle)
 
